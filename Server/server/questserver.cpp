@@ -2043,7 +2043,7 @@ void QuestServer::LoadNPCQuests()
 			int iProgressID;
 			int iCompleteID;
 			int iQuestType;
-			int iASMQuestBit;
+			int iASMQuestBit = 0;
 
 			while (pcDB->Fetch())
 			{

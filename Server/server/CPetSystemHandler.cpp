@@ -209,7 +209,7 @@ void CPetSystemHandler::RemovePet(UserData* pcUserData)
 
 	pcUserData->bPetSystemSkinID = 0;
 	pcUserData->dwObjectPetSystemID = 0;
-	pcUserData->pcPetSystem == nullptr;
+	pcUserData->pcPetSystem = nullptr;
 	
 }
 

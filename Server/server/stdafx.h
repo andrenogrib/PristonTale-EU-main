@@ -53,7 +53,7 @@
 //Custom Include:
 #include "globals.h"
 
-void * operator new[]( std::size_t s ) throw(std::bad_alloc);
-void operator delete[]( void *p ) throw();
-void * operator new(std::size_t s) throw(std::bad_alloc);
-void operator delete(void *p) throw();
+void * operator new[]( std::size_t s ) noexcept(false);
+void operator delete[]( void *p ) noexcept;
+void * operator new(std::size_t s) noexcept(false);
+void operator delete(void *p) noexcept;

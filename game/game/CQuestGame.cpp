@@ -506,7 +506,7 @@ void CQuestGame::HandlePacket( PacketHandleFinishedQuest * psPacket )
 			const int rankUpTier0Based = psPacket->iaExtraRewardValue[j];
 
 			if ( rankUpTier0Based >= 0 && rankUpTier0Based <= 3 &&
-				 rankUpTier0Based > PLAYER_TIER )
+				 static_cast<UINT>(rankUpTier0Based) > PLAYER_TIER )
 			{
 				PLAYER_TIER = rankUpTier0Based;
 

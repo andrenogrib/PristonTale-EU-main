@@ -16,7 +16,7 @@ DWORD GetMajorAllocatorP()
 	return dwPAllocs;
 }
 
-void * operator new[](std::size_t s) throw(std::bad_alloc)
+void * operator new[](std::size_t s) noexcept(false)
 {	
 	if ( s > dwAllocs )
 	{
@@ -29,14 +29,14 @@ void * operator new[](std::size_t s) throw(std::bad_alloc)
 	void * p = fnNewOperator( s );
 	return p;
 }
-void operator delete[](void *p) throw()
+void operator delete[](void *p) noexcept
 {
 	typedef void( __cdecl *tfnDeleteOperator )(void * p);
 	tfnDeleteOperator fnDeleteOperator = (tfnDeleteOperator)0x00767512;
 	fnDeleteOperator( p );
 }
 
-void * operator new(std::size_t s) throw(std::bad_alloc)
+void * operator new(std::size_t s) noexcept(false)
 {
 	if ( s > dwAllocs )
 	{
@@ -50,7 +50,7 @@ void * operator new(std::size_t s) throw(std::bad_alloc)
 	void * p = fnNewOperator( s );
 	return p;
 }
-void operator delete(void *p) throw()
+void operator delete(void *p) noexcept
 {
 	typedef void( __cdecl *tfnDeleteOperator )(void * p);
 	tfnDeleteOperator fnDeleteOperator = (tfnDeleteOperator)0x00767512;

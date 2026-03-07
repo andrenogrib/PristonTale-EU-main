@@ -58,7 +58,7 @@ class UxxxTarget
         }
         inline CharacterData * GetCharacterData() { if (IsTargetUnit()) return &unitData->sCharacterData; else if (IsTargetPlayer()) return &userData->sCharacterData; else return nullptr; }
         inline ECharacterType GetCharacterType() { return GetCharacterData() != nullptr ? GetCharacterData()->iType : ECharacterType::CHARACTERTYPE_None; }
-        inline Point3D & GetPosition() { if (IsTargetUnit()) return unitData->sPosition; else if (IsTargetPlayer()) return userData->sPosition; else return Point3D(); }
+        inline Point3D GetPosition() { if (IsTargetUnit()) return unitData->sPosition; else if (IsTargetPlayer()) return userData->sPosition; else return Point3D(); }
 
         /// Monster only
         inline bool IsTargetUnit() { return unitData != nullptr; }

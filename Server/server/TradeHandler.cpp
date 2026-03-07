@@ -301,10 +301,10 @@ void CTradeHandler::HandleTradeCoin( User * pcUser, User * pcPartner )
 	if ( pcPartner && pcPartner->pcUserData->pcSocketData && pcUser && pcUser->pcUserData->pcSocketData )
 	{
 		//Trade Coins...
-		if ( pcUser->iTradeCoin && COINSHOPHANDLER->HasCoinAmount( pcUser->pcUserData->szAccountName, pcUser->iTradeCoin * 0.90) )
+		if ( pcUser->iTradeCoin && COINSHOPHANDLER->HasCoinAmount( pcUser->pcUserData->szAccountName, static_cast<int>(pcUser->iTradeCoin * 0.90)) )
 		{
 			//Add Coin to Partner...
-			COINSHOPHANDLER->AddCoin( pcPartner->pcUserData->szAccountName, pcUser->iTradeCoin * 0.90 );
+			COINSHOPHANDLER->AddCoin( pcPartner->pcUserData->szAccountName, static_cast<int>(pcUser->iTradeCoin * 0.90) );
 
 			//Discount from user...
 			COINSHOPHANDLER->UseCoin( pcUser->pcUserData->szAccountName, pcUser->iTradeCoin );
@@ -312,12 +312,12 @@ void CTradeHandler::HandleTradeCoin( User * pcUser, User * pcPartner )
 
 			CHATSERVER->SendChatEx(pcPartner, EChatColor::CHATCOLOR_Trade, "> 10 percent of the coins was taxed.");
 
-			CHATSERVER->SendChatEx( pcPartner, EChatColor::CHATCOLOR_Trade, "> You received %s credits from %s!", FormatNumber( pcUser->iTradeCoin * 0.90), pcUser->pcUserData->sCharacterData.szName );
+			CHATSERVER->SendChatEx( pcPartner, EChatColor::CHATCOLOR_Trade, "> You received %s credits from %s!", FormatNumber( static_cast<__int64>(pcUser->iTradeCoin * 0.90)), pcUser->pcUserData->sCharacterData.szName );
 			CHATSERVER->SendChatEx( pcPartner, EChatColor::CHATCOLOR_Trade, "> You now have %s credits!", FormatNumber( COINSHOPHANDLER->GetCoinAmount( pcPartner->pcUserData->szAccountName ) ) );
 
 			CHATSERVER->SendChatEx(pcUser, EChatColor::CHATCOLOR_Trade, "> 10% of the coins was taxed.");
 
-			CHATSERVER->SendChatEx( pcUser, EChatColor::CHATCOLOR_Trade, "> You sent %s credits to %s!", FormatNumber( pcUser->iTradeCoin * 0.90), pcPartner->pcUserData->sCharacterData.szName );
+			CHATSERVER->SendChatEx( pcUser, EChatColor::CHATCOLOR_Trade, "> You sent %s credits to %s!", FormatNumber( static_cast<__int64>(pcUser->iTradeCoin * 0.90)), pcPartner->pcUserData->sCharacterData.szName );
 			CHATSERVER->SendChatEx( pcUser, EChatColor::CHATCOLOR_Trade, "> You now have %s credits!", FormatNumber( COINSHOPHANDLER->GetCoinAmount( pcUser->pcUserData->szAccountName ) ) );
 
 			//Coin Log

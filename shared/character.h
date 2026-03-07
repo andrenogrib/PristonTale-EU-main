@@ -1124,7 +1124,7 @@ struct CharacterClassData
 	char				* pszName;
 	char				* pszNameTranslated;
 
-	int					iClassBit;
+	unsigned int		iClassBit;
 	int					iClass;
 	int					iRace;
 

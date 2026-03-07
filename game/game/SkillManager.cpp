@@ -4354,7 +4354,7 @@ void SkillManager::SetWeaponDamageBuffFromSkill (int * iSkillDamage, int * iWeap
 			iPercent = GetSkillIntValue(ESkillArrayPointer::Mech_MechanicWeaponMastery_AddWeaponDamagePercent, ESkillID::SKILLID_MechanicWeaponMastery);
 
 			if (!psItemData->IsTwoHandedWeapon())
-				iPercent *= 0.5;
+				iPercent /= 2;
 
 			if (psItemData->sItem.sItemID.ToItemType() == EItemType::ITEMTYPE_Hammer)
 				iPercent *= 2;

@@ -4287,7 +4287,7 @@ void ItemServer::SQLAddItemTimer ( SQLConnection * pcDB, int iCharID, char * psz
 {
 	if ( iCharID == 0 )
 	{
-		ERROR("ItemServer::SQLAddItemTimer: Character ID is 0 for player %s", pszCharName);
+		LOGERROR("ItemServer::SQLAddItemTimer: Character ID is 0 for player %s", pszCharName);
 		return;
 	}
 

@@ -89,7 +89,7 @@ void CGameCharacterStatus::UpdateCharacterStatus( CharacterDataLocal * psData)
 	//Absorb formula with items that have formula div 2 ( 0.5 abs )
 	psData->iCountAbsorbItems /= 2;
 #ifdef ITEMFIXES
-	playerData->iAbsorbRating = (int)(((fDefense / 100.0f) + (fLevel / 10.0f) + psData->fAbsorbSkills + psData->fAbsorbAdd) + ((fStrength + fTalent) / 40) + psData->iCountAbsorbItems + 1) + eItemFixData.fAbsorb;
+	playerData->iAbsorbRating = (int)(((fDefense / 100.0f) + (fLevel / 10.0f) + psData->fAbsorbSkills + psData->fAbsorbAdd) + ((fStrength + fTalent) / 40) + psData->iCountAbsorbItems + 1 + eItemFixData.fAbsorb);
 #else
 	playerData->iAbsorbRating = (int)(((fDefense / 100.0f) + (fLevel / 10.0f) + psData->fAbsorbSkills + psData->fAbsorbAdd) + ((fStrength + fTalent) / 40) + psData->iCountAbsorbItems + 1);
 #endif

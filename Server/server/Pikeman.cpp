@@ -413,7 +413,7 @@ int CPikeman::RecvSkillAreaTarget( User * pcUser, UxxxTarget * p_Target, PacketS
 		return 0;
 	}
 
-	int value, chain, range, count;
+	int value, range, count;
 	int attackPower = psPacketRange->iDamage;
 
 	switch ( uSkillID )

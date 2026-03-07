@@ -270,7 +270,9 @@ std::string CWMIReader::Get( std::string strProperty )
 		VARIANT vtProp;
 		hr = pClassObject->Get( std::wstring( strProperty.begin(), strProperty.end() ).c_str(), 0, &vtProp, 0, 0 );
 		std::wstring ws( STRLENW( vtProp.bstrVal ) > 0 ? vtProp.bstrVal : L"" );
-		strRet = std::string( ws.begin(), ws.end() );
+		strRet.resize( ws.size() );
+		for ( size_t i = 0; i < ws.size(); i++ )
+			strRet[i] = static_cast<char>( ws[i] );
 		VariantClear( &vtProp );
 
 		pClassObject->Release();

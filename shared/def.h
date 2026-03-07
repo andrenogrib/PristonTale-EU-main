@@ -4,7 +4,7 @@
 //#define DEV_MODE 			
 #define GAME_VERSION		1309
 #define GAME_NAME			"Priston Tale - Testing"
-#define GAME_XOR			((((GAME_VERSION) * 519 * 16510 * 14 + 595) % 180) + 20)
+#define GAME_XOR			((((unsigned)(GAME_VERSION) * 519u * 16510u * 14u + 595u) % 180u) + 20u)
 
 
 //TEMP TEMP TEMP - REMOVE IN NEXT UPDATE! <<<<<<<<<<<<<<<<<<

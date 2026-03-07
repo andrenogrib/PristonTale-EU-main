@@ -332,7 +332,9 @@ NTSTATUS WINAPI DllLoaderHooker( IN PWCHAR PathToFile OPTIONAL,
 
 		//Set to Lower Case String
 		std::wstring wstr = ModuleFileName->Buffer;
-		std::string str( wstr.begin(), wstr.end() );
+		std::string str( wstr.size(), '\0' );
+		for ( size_t i = 0; i < wstr.size(); i++ )
+			str[i] = static_cast<char>( wstr[i] );
 		std::transform( str.begin(), str.end(), str.begin(), []( unsigned char c ) { return std::tolower( c ); } );
 
 		//Have a Dir?

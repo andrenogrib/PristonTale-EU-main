@@ -78,7 +78,7 @@ double RoundOffToNearestDP(double N, int dp)
 float RoundOffToNearestDP(float N, int dp)
 {
 	double multiplier = pow(10, dp);
-	float value = std::round(N * multiplier) / multiplier;
+	float value = static_cast<float>(std::round(N * multiplier) / multiplier);
 	return value;
 }
 

@@ -4,9 +4,11 @@
 CSystem::CSystem()
 {
 	os_version_info.dwOSVersionInfoSize = sizeof( os_version_info );
+#pragma warning(suppress: 4996)
 	GetVersionEx( (LPOSVERSIONINFO)&os_version_info );
 
 	os_version_info_ex.dwOSVersionInfoSize = sizeof( os_version_info_ex );
+#pragma warning(suppress: 4996)
 	GetVersionEx( (LPOSVERSIONINFO)&os_version_info_ex );
 
 	GetSystemInfo( (LPSYSTEM_INFO)&sys_info );

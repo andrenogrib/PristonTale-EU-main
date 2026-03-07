@@ -2,7 +2,7 @@
 #include "CGameEngine.h"
 
 bool DetectCheatEngineByHWND();
-uint64_t DetectCooldown = 0;
+time_t DetectCooldown = 0;
 extern bool g_CheatEngineDetected;
 
 CGameEngine::CGameEngine()
