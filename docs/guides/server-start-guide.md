@@ -1,48 +1,48 @@
-# Guia para Ligar o Server
+# Server Startup Guide
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta doc e focada so em subir o ambiente local e explicar o que cada script faz.
+This guide focuses only on bringing up the local environment and explaining what each startup-related script does.
 
-Use este guia se voce quer:
+Use this guide if you want to:
 
-- ligar o SQL do projeto
-- restaurar os bancos
-- corrigir o client para localhost
-- subir login server e game server
-- abrir o jogo para testar
+- start the project SQL Server
+- restore the databases
+- patch the client to localhost
+- start the login server and game server
+- open the game and validate the runtime
 
-## Antes de comecar
+## Before you begin
 
-Este fluxo assume:
+This flow assumes:
 
-- repo aberto na raiz `PristonTale-EU-main`
-- pasta `Files/` presente dentro do repo
-- Docker Desktop instalado, se voce for usar o fluxo com container
+- the repository is open at the `PristonTale-EU-main` root
+- the `Files/` folder is present inside the repository
+- Docker Desktop is installed if you are using the container-based SQL flow
 
-Conta padrao de teste:
+Default local test account:
 
 - login: `admin`
-- senha: `admin`
+- password: `admin`
 
-Conta adicional de teste preparada neste ambiente:
+Additional local test account prepared in this environment:
 
 - login: `dedezin`
-- senha: `dedezin123`
-- privilegio de conta: `GameMasterType=1` e `GameMasterLevel=4`
-- personagem vinculado: `test_ps_100`
-- classe do personagem: pike
-- level do personagem: 100
+- password: `dedezin123`
+- account privilege: `GameMasterType=1` and `GameMasterLevel=4`
+- bound character: `test_ps_100`
+- class: pike
+- level: 100
 
-Importante:
+Important note:
 
-- se voce rodar `.\scripts\restore-pt-docker-dbs.ps1` de novo, o `UserDB` sera restaurado do backup
-- isso pode apagar contas customizadas e reverter a posse de personagens
-- depois do restore, rode `.\scripts\provision-pt-test-account.ps1` para recriar `dedezin`
+- if you run `.\scripts\restore-pt-docker-dbs.ps1` again, `UserDB` is restored from the baseline backup
+- that can remove custom accounts and revert character ownership
+- after a restore, run `.\scripts\provision-pt-test-account.ps1` again to recreate `dedezin`
 
-## Caminho mais curto
+## Shortest working path
 
-Na raiz do repo, rode nesta ordem:
+From the repository root, run:
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
@@ -52,174 +52,150 @@ Na raiz do repo, rode nesta ordem:
 .\scripts\start-pt-server.ps1
 ```
 
-Depois abra:
+Then open:
 
 ```powershell
 .\Files\Game\Game.exe
 ```
 
-Se quiser que o script tente abrir o client junto:
+If you want the startup script to open the client too:
 
 ```powershell
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
 
-## Ordem correta de uso
+## Correct startup order
 
-### 1. Subir o SQL
+### 1. Start SQL
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
 ```
 
-Esse passo sobe o SQL Server em Docker na `127.0.0.1,1433`.
+This starts SQL Server in Docker on `127.0.0.1,1433`.
 
-### 2. Restaurar os bancos
+### 2. Restore the databases
 
 ```powershell
 .\scripts\restore-pt-docker-dbs.ps1
 ```
 
-Esse passo restaura os `.bak`, cria `ChatDB` e `SkillDB` se estiverem faltando, e garante a conta `admin/admin`.
+This restores the `.bak` files, creates `ChatDB` and `SkillDB` if they are missing, and guarantees `admin/admin`.
 
-### 3. Corrigir o client para localhost
+### 3. Patch the client to localhost
 
 ```powershell
 .\scripts\patch-pt-client-localhost.ps1
 ```
 
-Esse passo e importante quando o `game.dll` do runtime pack ainda aponta para IP publico.
+This matters when the runtime `game.dll` still points to an older public IP instead of localhost.
 
-### 4. Corrigir o runtime local
+### 4. Apply local runtime fixes
 
 ```powershell
 .\scripts\fix-pt-local-runtime.ps1
 ```
 
-Esse passo aplica o workaround local para evitar alguns problemas ja conhecidos do runtime atual.
+This applies the current local workarounds for known runtime issues.
 
-### 5. Subir os dois servers
+### 5. Start both servers
 
 ```powershell
 .\scripts\start-pt-server.ps1
 ```
 
-Esse passo abre duas janelas de monitor:
+This opens two monitoring windows:
 
-- uma para o login server
-- uma para o game server
+- one for the login server
+- one for the game server
 
-### 6. Abrir o jogo
+### 6. Open the game
 
 ```powershell
 .\Files\Game\Game.exe
 ```
 
-Ou:
+Or:
 
 ```powershell
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
 
-## O que cada script faz
+## What each script does
 
 ### `start-pt-docker-sql.ps1`
 
-Arquivo: `scripts/start-pt-docker-sql.ps1`
+File: `scripts/start-pt-docker-sql.ps1`
 
-Funcao:
+What it does:
 
-- verifica se o Docker Desktop esta pronto
-- inicia o Docker Desktop se for necessario
-- cria ou inicia o container `priston-sql`
-- expoe o SQL em `127.0.0.1,1433`
-- monta `Files/DBS/extracted` dentro do container como pasta de backup
-- espera o SQL aceitar conexao antes de terminar
+- checks whether Docker Desktop is ready
+- starts Docker Desktop if needed
+- creates or starts the `priston-sql` container
+- exposes SQL on `127.0.0.1,1433`
+- mounts `Files/DBS/extracted` into the container as the backup directory
+- waits until SQL is accepting connections before exiting
 
-Use quando:
+Use it when:
 
-- voce quer usar SQL Server em Docker
-- ainda nao existe container rodando
-- voce reiniciou a maquina ou o Docker
-
-Comando padrao:
-
-```powershell
-.\scripts\start-pt-docker-sql.ps1
-```
+- you want to use SQL Server in Docker
+- no working SQL container is currently running
+- you rebooted the machine or Docker
 
 ### `restore-pt-docker-dbs.ps1`
 
-Arquivo: `scripts/restore-pt-docker-dbs.ps1`
+File: `scripts/restore-pt-docker-dbs.ps1`
 
-Funcao:
+What it does:
 
-- conecta no SQL em `127.0.0.1,1433`
-- restaura `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew` e `UserDB`
-- cria `ChatDB` e `SkillDB` como placeholder, se faltarem
-- cria ou atualiza a conta `admin/admin`
-- configura essa conta como GM/Admin para teste local
-- sobrescreve o `UserDB` restaurado com o estado do backup
+- connects to SQL on `127.0.0.1,1433`
+- restores `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew`, and `UserDB`
+- creates `ChatDB` and `SkillDB` as placeholders if they are missing
+- creates or updates `admin/admin`
+- sets that account as GM/Admin for local testing
+- overwrites `UserDB` with the restored baseline
 
-Use quando:
+Use it when:
 
-- voce acabou de subir o SQL em Docker
-- quer restaurar tudo do zero
-- quer garantir que a conta `admin/admin` exista
-
-Comando padrao:
-
-```powershell
-.\scripts\restore-pt-docker-dbs.ps1
-```
+- you just started SQL in Docker
+- you want a clean local baseline
+- you want to guarantee that `admin/admin` exists
 
 ### `patch-pt-client-localhost.ps1`
 
-Arquivo: `scripts/patch-pt-client-localhost.ps1`
+File: `scripts/patch-pt-client-localhost.ps1`
 
-Funcao:
+What it does:
 
-- procura no `Files/Game/game.dll` o IP antigo do runtime pack
-- troca esse IP por `127.0.0.1`
-- cria backup do binario antes de alterar
+- finds the old runtime IP inside `Files/Game/game.dll`
+- replaces it with `127.0.0.1`
+- creates a backup before patching
 
-Use quando:
+Use it when:
 
-- o client abre, mas mostra `connection failed`
-- o runtime pack veio configurado para um IP publico e nao para localhost
-- voce acabou de substituir a pasta `Files/Game`
-
-Comando padrao:
-
-```powershell
-.\scripts\patch-pt-client-localhost.ps1
-```
+- the client opens but shows `connection failed`
+- the runtime pack came from a public server environment
+- you replaced `Files/Game` with a fresh runtime pack
 
 ### `fix-pt-local-runtime.ps1`
 
-Arquivo: `scripts/fix-pt-local-runtime.ps1`
+File: `scripts/fix-pt-local-runtime.ps1`
 
-Funcao:
+What it does:
 
-- reduz o gold do `Administrador` para evitar o cheat `99007`
-- remove timers invalidos de premium em `CharacterItemTimer`
-- copia alguns `.chr` de teste para a pasta principal de personagens, se necessario
-- vincula personagens conhecidos a conta `admin`
-- mostra no final quais personagens ficaram disponiveis na conta
+- lowers `Administrador` gold to avoid cheat `99007`
+- removes invalid premium timer rows from `CharacterItemTimer`
+- copies known test `.chr` files into the main character directory when needed
+- binds known characters to `admin`
+- shows which characters are currently available on the account
 
-Use quando:
+Use it when:
 
-- o `Administrador` acusa cheat
-- a criacao de personagem esta falhando
-- voce quer garantir chars jogaveis na conta `admin`
+- `Administrador` triggers a cheat warning
+- the runtime left broken data behind
+- you want guaranteed playable characters on `admin`
 
-Comando padrao:
-
-```powershell
-.\scripts\fix-pt-local-runtime.ps1
-```
-
-Personagens que ele tenta deixar usaveis em `admin`:
+Characters it tries to keep available on `admin`:
 
 - `Administrador`
 - `aglob`
@@ -230,23 +206,23 @@ Personagens que ele tenta deixar usaveis em `admin`:
 
 ### `provision-pt-test-account.ps1`
 
-Arquivo: `scripts/provision-pt-test-account.ps1`
+File: `scripts/provision-pt-test-account.ps1`
 
-Funcao:
+What it does:
 
-- cria ou atualiza uma conta customizada no `UserDB`
-- grava a senha no mesmo formato de hash usado pelo client
-- configura `GameMasterType` e `GameMasterLevel`
-- vincula um personagem existente a essa conta
-- ajusta o `GMLevel` do personagem
+- creates or updates a custom account in `UserDB`
+- writes the password in the same hash format used by the client
+- sets `GameMasterType` and `GameMasterLevel`
+- binds an existing character to that account
+- updates the character `GMLevel`
 
-Use quando:
+Use it when:
 
-- voce restaurou os bancos e perdeu contas customizadas
-- quer recriar rapidamente uma conta de teste
-- quer transferir um personagem de teste existente para outra conta
+- you restored the databases and lost a custom account
+- you want to recreate a test account quickly
+- you want to move a known test character to a different account
 
-Exemplo usado neste ambiente:
+Example used in this environment:
 
 ```powershell
 .\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
@@ -254,108 +230,85 @@ Exemplo usado neste ambiente:
 
 ### `start-pt-server.ps1`
 
-Arquivo: `scripts/start-pt-server.ps1`
+File: `scripts/start-pt-server.ps1`
 
-Funcao:
+What it does:
 
-- valida se `Files/Server/login-server/Server.exe` existe
-- valida se `Files/Server/game-server/Server.exe` existe
-- impede start duplicado se os servers ja estiverem rodando
-- abre janelas PowerShell separadas para monitorar cada server
-- pode abrir o client junto
-- pode usar `AutoRestart.bat` em vez de abrir o `Server.exe` diretamente
+- checks that `Files/Server/login-server/Server.exe` exists
+- checks that `Files/Server/game-server/Server.exe` exists
+- prevents duplicate startup if the project servers are already running
+- opens separate PowerShell windows to monitor each server
+- can open the client too
+- can use `AutoRestart.bat` instead of `Server.exe`
 
-Use quando:
+Use it when:
 
-- o SQL ja esta pronto
-- os bancos ja foram restaurados
-- o client ja foi ajustado para localhost
-- voce quer subir os dois servers
+- SQL is ready
+- the databases were restored
+- the client runtime is already aligned to localhost
+- you want to bring up both servers
 
-Comando padrao:
-
-```powershell
-.\scripts\start-pt-server.ps1
-```
-
-Abrindo tambem o jogo:
+Also useful:
 
 ```powershell
 .\scripts\start-pt-server.ps1 -OpenClient
-```
-
-Usando `AutoRestart.bat`:
-
-```powershell
 .\scripts\start-pt-server.ps1 -UseAutoRestart
 ```
 
 ### `watch-pt-server.ps1`
 
-Arquivo: `scripts/watch-pt-server.ps1`
+File: `scripts/watch-pt-server.ps1`
 
-Funcao:
+What it does:
 
-- e o monitor interno chamado pelo `start-pt-server.ps1`
-- abre o `Server.exe` ou o `AutoRestart.bat`
-- mostra informacoes da pasta e do log
-- acompanha o `Log.txt` em tempo real com `Get-Content -Wait`
+- acts as the internal monitor called by `start-pt-server.ps1`
+- launches `Server.exe` or `AutoRestart.bat`
+- prints folder and log information
+- tails `Log.txt` in real time with `Get-Content -Wait`
 
-Use quando:
+Use it when:
 
-- normalmente voce nao precisa rodar ele manualmente
-- ele existe para abrir a janela de log de cada server
+- normally you do not need to run it directly
+- it exists to provide one live log window per server
 
-Observacao:
+Important note:
 
-- se voce fechar so a janela de monitor, o server pode continuar rodando
-- para encerrar direito, use `.\scripts\stop-pt-server.ps1`
+- if you only close the monitor window, the server process may still be running
+- to stop everything cleanly, use `.\scripts\stop-pt-server.ps1`
 
 ### `stop-pt-server.ps1`
 
-Arquivo: `scripts/stop-pt-server.ps1`
+File: `scripts/stop-pt-server.ps1`
 
-Funcao:
+What it does:
 
-- encerra os `Server.exe` do login e do game
-- encerra as janelas de monitor abertas por `watch-pt-server.ps1`
-- encerra processos `AutoRestart.bat`, se existirem
+- stops both `Server.exe` processes
+- closes the monitor windows opened by `watch-pt-server.ps1`
+- closes any `AutoRestart.bat` processes if they exist
 
-Use quando:
+Use it when:
 
-- voce quer parar tudo antes de iniciar de novo
-- terminou o teste
-- vai trocar config ou banco e quer reiniciar limpo
-
-Comando padrao:
-
-```powershell
-.\scripts\stop-pt-server.ps1
-```
+- you want to stop everything before starting again
+- you finished testing
+- you changed config or database state and want a clean restart
 
 ### `stop-pt-docker-sql.ps1`
 
-Arquivo: `scripts/stop-pt-docker-sql.ps1`
+File: `scripts/stop-pt-docker-sql.ps1`
 
-Funcao:
+What it does:
 
-- para o container `priston-sql`
+- stops the `priston-sql` container
 
-Use quando:
+Use it when:
 
-- terminou os testes
-- quer liberar recursos
-- vai reiniciar o ambiente do zero depois
+- you finished testing
+- you want to free resources
+- you want to rebuild the environment from scratch later
 
-Comando padrao:
+## Recommended validation flow
 
-```powershell
-.\scripts\stop-pt-docker-sql.ps1
-```
-
-## Fluxo recomendado para teste
-
-### Subir tudo do zero
+### Start everything from scratch
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
@@ -365,14 +318,14 @@ Comando padrao:
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
 
-### Parar tudo
+### Stop everything
 
 ```powershell
 .\scripts\stop-pt-server.ps1
 .\scripts\stop-pt-docker-sql.ps1
 ```
 
-### Subir de novo sem restaurar os bancos
+### Start again without restoring the database
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
@@ -380,35 +333,35 @@ Comando padrao:
 .\scripts\start-pt-server.ps1
 ```
 
-## Como saber se deu certo
+## How to know it worked
 
-Sinais bons:
+Good signs:
 
-- o SQL responde em `127.0.0.1,1433`
-- o `start-pt-server.ps1` abre duas janelas de monitor
-- os logs do login server e do game server ficam atualizando
-- o client abre sem `connection failed`
-- o login `admin/admin` funciona
-- a conta `admin` mostra personagens na tela de selecao
+- SQL responds on `127.0.0.1,1433`
+- `start-pt-server.ps1` opens two monitor windows
+- both log files keep updating
+- the client opens without `connection failed`
+- `admin/admin` logs in successfully
+- the character selection screen appears
 
-Voce tambem pode testar com a conta extra:
+You can also test with the additional account:
 
 - login: `dedezin`
-- senha: `dedezin123`
-- personagem: `test_ps_100`
-- para ativar GM no jogo: `/activategm`
+- password: `dedezin123`
+- character: `test_ps_100`
+- enable GM mode with `/activategm`
 
-Se voce acabou de rodar o restore e a conta sumiu:
+If the account disappeared after a restore:
 
 ```powershell
 .\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
 ```
 
-## Se der erro
+## If an error appears
 
 ### `connection failed`
 
-Rode:
+Run:
 
 ```powershell
 .\scripts\patch-pt-client-localhost.ps1
@@ -416,22 +369,22 @@ Rode:
 
 ### `Cheat detected: 99007`
 
-Rode:
+Run:
 
 ```powershell
 .\scripts\fix-pt-local-runtime.ps1
 ```
 
-### Falha ao criar personagem
+### Character creation fails
 
-No runtime atual, isso ainda pode acontecer por causa do driver ODBC do server.
+In the current runtime, character creation can still be affected by database alignment problems.
 
-Entao, por enquanto:
+For now:
 
-- use os personagens ja vinculados em `admin`
-- nao dependa da tela de criacao de personagem novo
+- use the characters already available on `admin`
+- do not depend on the new-character screen for validation
 
-## Docs relacionadas
+## Related docs
 
 - `docs/guides/setup-run-test-guide.md`
 - `docs/analysis/project-analysis.md`

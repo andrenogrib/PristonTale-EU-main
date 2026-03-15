@@ -1,12 +1,12 @@
 # Item ID Reference
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Gerado automaticamente por `scripts/export-pt-reference-docs.ps1` a partir de `GameDB.dbo.ItemList` e `GameDB.dbo.ItemListOld`.
+Generated automatically by `scripts/export-pt-reference-docs.ps1` from `GameDB.dbo.ItemList` and `GameDB.dbo.ItemListOld`.
 
 ## ItemList
 
-| CodeIMG1 | IDCode | Name | DropFolder | ClassItem |
+| ItemCode | IDCode | Name | Category | ClassItem |
 | --- | --- | --- | --- | --- |
 | sd207 | 134809344 | +5000 Points UP | Event | 1 |
 | da303 | 33631744 | Abyss Armor | Defense | 8 |
@@ -1047,7 +1047,7 @@ Gerado automaticamente por `scripts/export-pt-reference-docs.ps1` a partir de `G
 
 ## ItemListOld
 
-| CodeIMG1 | IDCode | Name | DropFolder | ClassItem |
+| ItemCode | IDCode | Name | Category | ClassItem |
 | --- | --- | --- | --- | --- |
 | sd207 | 134809344 | +5000 Points UP | Event | 1 |
 | WD111 | 17435392 | Abyss Dagger | Weapon | 6 |

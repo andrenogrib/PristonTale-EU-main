@@ -1,8 +1,8 @@
 # Monster ID Reference
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Gerado automaticamente por `scripts/export-pt-reference-docs.ps1` a partir de `GameDB.dbo.MonsterList`.
+Generated automatically by `scripts/export-pt-reference-docs.ps1` from `GameDB.dbo.MonsterList`.
 
 | MonsterID | Name | Level | EXP | DropQuantity | ModelFile | DropIsPublic |
 | --- | --- | --- | --- | --- | --- | --- |

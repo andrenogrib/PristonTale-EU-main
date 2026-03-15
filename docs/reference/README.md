@@ -1,25 +1,21 @@
 # Reference
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta pasta guarda consulta rapida.
+This folder contains quick lookup material.
 
-Coloque aqui:
+Place documents here when they answer questions such as:
 
-- comandos de GM
-- item codes
-- tabelas importantes
-- caminhos de source
-- lookup rapido de nomes, IDs e parametros
+- what command should I use?
+- what item code or monster ID do I need?
+- where is this defined in the source?
+- what is the fastest way to find a specific parameter or table?
 
-Regra pratica:
+## Current reference files
 
-- se a doc responde "onde eu acho isso rapido?", ela entra em `docs/reference/`
-
-## Referencias atuais
-
-- `docs/reference/server-commands-reference.md`: lista completa dos comandos de player, GM1, GM2, GM3 e GM4/Admin
-- `docs/reference/item-code-and-data-reference.md`: explica onde achar `itemCode`, `ItemID`, drop e dados do banco
-- `docs/reference/map-id-reference.md`: IDs de mapa com nome, short name e stage file
-- `docs/reference/item-id-reference.md`: `itemCode`, `IDCode`, nome e classe do item
-- `docs/reference/monster-id-reference.md`: `MonsterID`, nome, level, EXP e model file
+- `docs/reference/server-commands-reference.md`: full command reference for player, GM1, GM2, GM3, and GM4/Admin commands
+- `docs/reference/item-code-and-data-reference.md`: where to find `itemCode`, `ItemID`, drop data, and related database tables
+- `docs/reference/map-id-reference.md`: map IDs with names, short names, and stage files
+- `docs/reference/item-id-reference.md`: item codes, numeric IDs, names, and categories
+- `docs/reference/monster-id-reference.md`: monster IDs, names, levels, EXP values, and model files
+- `docs/reference/ids/README.md`: dedicated ID lookup section with separate files for maps, monsters, equipment, potions, and other items

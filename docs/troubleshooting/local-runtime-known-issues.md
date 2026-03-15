@@ -1,99 +1,98 @@
 # Local Runtime Known Issues
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta doc concentra os erros reais ja observados no ambiente local atual.
+This document collects the real issues already observed in the current local environment.
 
 ## `connection failed`
 
-Sintoma:
+Symptom:
 
-- o client abre
-- o login falha antes mesmo de chegar no `login-server`
+- the client opens
+- login fails before the request ever reaches the login server
 
-Causa raiz:
+Root cause:
 
-- o `Files/Game/game.dll` do runtime pack pode vir apontando para IP publico em vez de `127.0.0.1`
+- `Files/Game/game.dll` from the runtime pack may still point to a public IP instead of `127.0.0.1`
 
-Correcao:
+Fix:
 
 ```powershell
 .\scripts\patch-pt-client-localhost.ps1
 ```
 
-## Cheat `99007` no `Administrador`
+## Cheat `99007` on `Administrador`
 
-Sintoma:
+Symptom:
 
-- o log acusa `WARN: Cheat detected: 99007 for user: Administrador`
+- the log shows `WARN: Cheat detected: 99007 for user: Administrador`
 
-Causa raiz:
+Root cause:
 
-- o personagem veio com gold acima do limite permitido pelo server
+- the character shipped with more gold than the current server runtime allows
 
-Correcao:
-
-```powershell
-.\scripts\fix-pt-local-runtime.ps1
-```
-
-## Falha ao criar personagem
-
-Sintoma:
-
-- criar personagem gera `HY104` e `07002`
-- o log mostra falha em `INSERT INTO CharacterInfo`
-- o login server tambem pode falhar em `INSERT INTO CharacterLog`
-
-Causa raiz:
-
-- o runtime atual do server usa binds ODBC que nao casam bem com o driver generico `{SQL Server}`
-- no ambiente atual, isso afeta principalmente criacao de personagem
-
-Workaround atual:
+Fix:
 
 ```powershell
 .\scripts\fix-pt-local-runtime.ps1
 ```
 
-Esse workaround:
+## Character creation failure
 
-- limpa sujeira de tentativas quebradas
-- garante personagens jogaveis na conta `admin`
+Symptom:
 
-Correcao definitiva:
+- creating a character produces `HY104` or `07002`
+- the log shows failures in `INSERT INTO CharacterInfo`
+- the login server may also fail on `INSERT INTO CharacterLog`
 
-- instalar um driver ODBC compativel com esse binario, como `SQL Server Native Client 11.0` ou `ODBC Driver 17 for SQL Server`
+Historical root cause:
 
-Status atual do ambiente:
+- the current runtime previously used ODBC parameter bindings that did not work well with the generic `{SQL Server}` driver
 
-- o `ODBC Driver 17 for SQL Server` ja esta configurado nos `server.ini`
-- isso removeu os erros antigos de bind ODBC como `HY104` e `07002`
-- os erros restantes observados agora sao de schema e rotinas ausentes, nao do driver em si
+Current environment status:
 
-## Login falha para conta customizada depois de restore
+- `ODBC Driver 17 for SQL Server` is already configured in the runtime `server.ini` files
+- that change removed the earlier ODBC bind errors such as `HY104` and `07002`
+- the remaining boot-time issues are now schema and missing-routine issues, not driver issues
 
-Sintoma:
+Current workaround:
 
-- a conta customizada existia antes
-- depois de rodar `.\scripts\restore-pt-docker-dbs.ps1`, o login passa a falhar
-- o log pode mostrar `SELECT TOP(1) FROM UserInfo query failed for account '<login>'`
+```powershell
+.\scripts\fix-pt-local-runtime.ps1
+```
 
-Causa raiz:
+That workaround:
 
-- o restore sobrescreve o `UserDB` com o backup base
-- isso remove contas criadas manualmente depois
-- a mesma restauracao tambem pode devolver personagens de teste para a conta antiga
+- cleans up broken data left by failed character creation attempts
+- keeps playable characters available for local testing
 
-Correcao:
+Preferred long-term fix:
+
+- fully align the current database schema with the runtime binary expectations
+
+## Custom account login fails after a restore
+
+Symptom:
+
+- the custom account used to work
+- after running `.\scripts\restore-pt-docker-dbs.ps1`, login starts failing
+- the log may show `SELECT TOP(1) FROM UserInfo query failed for account '<login>'`
+
+Root cause:
+
+- the restore overwrites `UserDB` with the backup baseline
+- that removes accounts created later
+- it can also return test characters to their older owner
+
+Fix:
 
 ```powershell
 .\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
 ```
 
-## Personagens seguros para teste na conta `admin`
+## Safe local test characters on `admin`
 
-Hoje os personagens recomendados para teste local sao:
+The currently recommended local test characters are:
 
 - `Administrador`
 - `aglob`

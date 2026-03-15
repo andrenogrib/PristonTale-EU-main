@@ -1,66 +1,69 @@
 # Item Code And Data Reference
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta doc explica onde encontrar `itemCode`, `ItemID`, nome de item, drop, spawn e dados de monstro.
+This document explains where to find `itemCode`, numeric `ItemID`, item names, drop data, spawn data, and related monster information.
 
-Se voce quer usar comandos como `/getitem`, `/giveitem`, `/sql_EXP` ou editar drop, esta e a referencia que evita ficar abrindo source aleatorio.
+If you want to use commands such as `/getitem`, `/giveitem`, `/sql_EXP`, or edit drop-related data, this is the reference that keeps you from hunting through random source files.
 
 ## TL;DR
 
-- O `itemCode` usado por GM commands como `/getitem` e `/giveitem` vem de `GameDB.dbo.ItemList.CodeIMG1`
-- O `ItemID` numerico vem de `GameDB.dbo.ItemList.IDCode`
-- O nome mostrado ao jogador vem de `GameDB.dbo.ItemList.Name`
-- O model/drop code vem de `GameDB.dbo.ItemList.CodeIMG2`
-- A versao legacy vem de `GameDB.dbo.ItemListOld`
-- Drop de monstro vem de `GameDB.dbo.DropItem`
-- Spawn por mapa vem de `GameDB.dbo.MapMonster`
-- Status base de monstro vem de `GameDB.dbo.MonsterList`
+- The `itemCode` used by GM commands such as `/getitem` and `/giveitem` comes from `GameDB.dbo.ItemList.CodeIMG1`
+- The numeric `ItemID` comes from `GameDB.dbo.ItemList.IDCode`
+- The player-facing name comes from `GameDB.dbo.ItemList.Name`
+- The model/drop code comes from `GameDB.dbo.ItemList.CodeIMG2`
+- The legacy item table is `GameDB.dbo.ItemListOld`
+- Monster drop data comes from `GameDB.dbo.DropItem`
+- Map spawn data comes from `GameDB.dbo.MapMonster`
+- Base monster stats come from `GameDB.dbo.MonsterList`
 
-## Exemplo real do banco local
+## Real example from the local database
 
-No banco restaurado, os primeiros itens de `ItemList` estao assim:
+In the restored database, early `ItemList` entries look like this:
 
 - `IDCode=16843008`, `Name=Stone Axe`, `CodeIMG1=WA101`
 - `IDCode=16843264`, `Name=Steel Axe`, `CodeIMG1=WA102`
 - `IDCode=16843520`, `Name=Battle Axe`, `CodeIMG1=WA103`
 
-Ou seja:
+That means:
 
-- para `/getitem`, o valor util e `WA101`
-- para logs, packets e varios pontos de source, o valor util e `16843008`
+- for `/getitem`, the useful value is `WA101`
+- for packets, logs, and many source-level operations, the useful value is `16843008`
 
-## Como o source resolve item
+## How the source resolves items
 
-### Lado server
+### Server side
 
-O pipeline principal esta em `Server/server/itemserver.cpp`.
+The main pipeline lives in `Server/server/itemserver.cpp`.
 
-Pontos mais importantes:
+Important entry points:
 
 - `CreateItemMemoryTable()`
-  - carrega `ItemListOld` e `ItemList` do `GameDB`
+  - loads `ItemListOld` and `ItemList` from `GameDB`
 - `FindItemPointerTable(char* szCode)`
-  - procura pelo `itemCode` textual
+  - looks up the textual item code
 - `FindItemDefByCode(char* pszCode)`
-  - converte `itemCode` textual para `DefinitionItem`
+  - converts the textual item code to a `DefinitionItem`
 - `FindItemDefByCode(DWORD dwCode)`
-  - procura por `ItemID` numerico
+  - looks up the numeric item ID
 - `FindItemName(char* pszCode, char* szBufName)`
-  - resolve nome visivel a partir de `itemCode`
+  - resolves the visible item name from the item code
 - `GetItemIDByItemCode(char* pszCode)`
-  - resolve `ItemID` numerico a partir do `itemCode`
+  - resolves the numeric item ID from the item code
 
-O ponto mais importante para o dia a dia e este:
+The practical takeaway is:
 
-- `CodeIMG1` do banco vira `szInventoryName` em memoria
-- `szInventoryName` e o que os comandos de GM usam como `itemCode`
+- `CodeIMG1` from the database becomes `szInventoryName` in memory
+- `szInventoryName` is what most GM commands use as the item code
 
-### Lado client
+### Client side
 
-O espelho de lookup fica em `game/game/ItemCreator.cpp` e `game/game/ItemHandler.cpp`.
+The client-side mirror lookup lives in:
 
-Campos copiados para a tabela de item do client:
+- `game/game/ItemCreator.cpp`
+- `game/game/ItemHandler.cpp`
+
+Important mirrored fields:
 
 - `szBaseName`
 - `szInventoryName`
@@ -68,38 +71,38 @@ Campos copiados para a tabela de item do client:
 - `szModelName`
 - `sBaseItemID`
 
-Entao, se voce quiser confirmar visualmente o mesmo item no client e no server, os nomes-chave sao:
+So if you want to line up client and server views of the same item, the key fields are:
 
 - `Name` / `szBaseName`
 - `CodeIMG1` / `szInventoryName`
 - `IDCode` / `sBaseItemID`
 
-## Mapa dos campos importantes
+## Important database fields
 
-### `GameDB.dbo.ItemList` e `GameDB.dbo.ItemListOld`
+### `GameDB.dbo.ItemList` and `GameDB.dbo.ItemListOld`
 
-Campos que mais importam para operacao e debug:
+Fields that matter most for operations and debugging:
 
 - `IDCode`
-  - ID numerico do item
+  - numeric item ID
 - `Name`
-  - nome visivel
+  - visible item name
 - `CodeIMG1`
-  - `itemCode` textual usado em `/getitem`, `/giveitem` e em tabelas de drop
+  - textual `itemCode` used by `/getitem`, `/giveitem`, and drop tables
 - `CodeIMG2`
-  - codigo/modelo de drop
+  - model/drop code
 - `DropFolder`
-  - categoria visual
+  - visual or logical category
 - `ClassItem`
-  - classe/slot base do item
+  - base class or slot category
 - `ModelPosition`
-  - posicao visual
+  - visual placement
 - `ReqLevel`, `ReqStrengh`, `ReqSpirit`, `ReqTalent`, `ReqAgility`, `ReqHealth`
-  - requisitos
+  - equip requirements
 
 ### `GameDB.dbo.DropItem`
 
-Estrutura real do banco local:
+Relevant columns in the current local database:
 
 - `ID`
 - `DropID`
@@ -108,31 +111,31 @@ Estrutura real do banco local:
 - `GoldMin`
 - `GoldMax`
 
-Como o server interpreta:
+How the server interprets them:
 
 - `DropID`
-  - chave logica da tabela de drop do monstro
+  - logical drop table key for a monster
 - `Items`
-  - pode ser:
+  - can contain:
     - `Gold`
     - `Air`
-    - ou varios `itemCode` separados por espaco
+    - or multiple `itemCode` values separated by spaces
 - `Chance`
-  - peso daquela linha
+  - weight for that row
 - `GoldMin`, `GoldMax`
-  - usados quando `Items='Gold'`
+  - used when `Items='Gold'`
 
-Exemplo real local:
+Real local example:
 
 - `DropID=1`, `Items=Gold`, `Chance=3000000`
 - `DropID=1`, `Items=Air`, `Chance=2750000`
 - `DropID=1`, `Items=pl102 ps102 pm102`, `Chance=1900000`
 
-Ou seja: o campo `Items` usa exatamente os `CodeIMG1` / `itemCode`.
+That means the `Items` field uses the same `CodeIMG1` / `itemCode` values that GM commands use.
 
 ### `GameDB.dbo.MonsterList`
 
-Campos mais usados:
+Most-used fields:
 
 - `Name`
 - `MonsterID`
@@ -149,16 +152,11 @@ Campos mais usados:
 - `AttackRating`
 - `AttackRange`
 
-Exemplo real local:
-
-- `Bargon`, `MonsterID=1`, `EXP=4300`, `DropQuantity=1`
-- `Skeleton Warrior`, `MonsterID=2`, `EXP=5500`, `DropQuantity=1`
-
 ### `GameDB.dbo.MapMonster`
 
-Esta tabela liga mapa -> monstros -> contagem -> boss/minions.
+This table maps a stage to monster groups, counts, bosses, and support spawns.
 
-Campos mais uteis:
+Useful fields:
 
 - `Stage`
 - `Monster1..Monster12`
@@ -168,14 +166,9 @@ Campos mais uteis:
 - `SubMonster1..SubMonster3`
 - `CountSub1..CountSub3`
 
-Exemplo real local:
+## Ready-to-use SQL
 
-- `Stage=0`, `Monster1=Mushroom Ghost`, `Count1=12`
-- `Stage=0`, `Monster2=Hobgoblin`, `Count2=35`
-
-## SQL pronto para uso
-
-### Procurar item por nome ou codigo
+### Find an item by name or code
 
 ```sql
 SELECT TOP 100
@@ -192,7 +185,7 @@ WHERE [Name] LIKE '%stone%'
 ORDER BY [Name];
 ```
 
-### Procurar item legacy
+### Find a legacy item
 
 ```sql
 SELECT TOP 100
@@ -205,7 +198,7 @@ WHERE [Name] LIKE '%murky%'
 ORDER BY [Name];
 ```
 
-### Resolver `ItemID` numerico a partir do `itemCode`
+### Resolve numeric `ItemID` from `itemCode`
 
 ```sql
 SELECT
@@ -216,9 +209,9 @@ FROM GameDB.dbo.ItemList
 WHERE CodeIMG1 = 'WA101';
 ```
 
-### Ver o drop table de um monstro
+### View a monster drop table
 
-Primeiro descubra o `MonsterID`:
+First find the `MonsterID`:
 
 ```sql
 SELECT Name, MonsterID
@@ -226,7 +219,7 @@ FROM GameDB.dbo.MonsterList
 WHERE Name LIKE '%Bargon%';
 ```
 
-Depois use o `MonsterID` como `DropID`:
+Then use the `MonsterID` as `DropID`:
 
 ```sql
 SELECT
@@ -240,7 +233,7 @@ WHERE DropID = 1
 ORDER BY Chance DESC;
 ```
 
-### Ver o spawn de um mapa
+### View spawn data for a map
 
 ```sql
 SELECT TOP 1 *
@@ -248,7 +241,7 @@ FROM GameDB.dbo.MapMonster
 WHERE Stage = 0;
 ```
 
-### Ver status base de um monstro
+### View base monster stats
 
 ```sql
 SELECT
@@ -267,9 +260,9 @@ FROM GameDB.dbo.MonsterList
 WHERE Name = 'Bargon';
 ```
 
-## Helper rapido no repo
+## Quick helpers in this repository
 
-Foi criado um utilitario para lookup de item sem precisar abrir o banco manualmente:
+The repository includes utilities so you do not need to open SQL manually every time:
 
 ```powershell
 .\scripts\find-pt-item.ps1 -Search "stone axe"
@@ -278,18 +271,18 @@ Foi criado um utilitario para lookup de item sem precisar abrir o banco manualme
 .\scripts\find-pt-item.ps1 -Search "murky" -Old
 ```
 
-Ele consulta:
+They query:
 
-- `ItemList` por padrao
-- `ItemListOld` quando voce usa `-Old`
+- `ItemList` by default
+- `ItemListOld` when you pass `-Old`
 
-## Como isso conversa com os GM commands
+## How this maps to GM commands
 
-### `/getitem` e `/giveitem`
+### `/getitem` and `/giveitem`
 
 Use `CodeIMG1`.
 
-Exemplo:
+Examples:
 
 - `WA101`
 - `PM102`
@@ -297,41 +290,41 @@ Exemplo:
 
 ### `/getitemold`
 
-Use `CodeIMG1` da tabela `ItemListOld`.
+Use `CodeIMG1` from `ItemListOld`.
 
-### `/sql_*` de monstro
+### `/sql_*` monster commands
 
-Esses comandos operam em um monstro spawnado no mapa. Eles persistem a mudanca no banco usando o cadastro base do monstro, mas o alvo inicial do comando e a unidade viva.
+These commands operate on a live monster in the map first, then persist changes back to the database definition.
 
-Em outras palavras:
+In practical terms:
 
-- `MonsterList` = definicao base
-- unidade viva no mapa = alvo runtime do comando
+- `MonsterList` = base monster definition
+- live monster unit = runtime target of the command
 
 ### `/ReloadMonsterDropTable`
 
-Esse comando recarrega `DropItem` do banco para a memoria do game server.
+This command reloads `DropItem` from the database into the game server memory.
 
-## Onde procurar no source
+## Where to look in the source
 
-### Item
+### Item handling
 
 - `Server/server/itemserver.cpp`
 - `Server/server/itemserver.h`
 - `game/game/ItemCreator.cpp`
 - `game/game/ItemHandler.cpp`
 
-### Drop e spawn
+### Drop and spawn handling
 
 - `Server/server/lootserver.cpp`
 - `Server/server/unitinfo.cpp`
 - `Server/server/TestMapHandler.cpp`
 
-### Comandos que usam item code
+### Commands that use item codes
 
 - `Server/server/servercommand.cpp`
 
-Pesquisas uteis:
+Useful searches:
 
 ```powershell
 rg -n "FindItemDefByCode|FindItemPointerTable|FindItemName|GetItemIDByItemCode" Server/server/itemserver.cpp
@@ -340,11 +333,11 @@ rg -n "DropItem|MonsterList|MapMonster" Server/server
 rg -n "/getitem|/giveitem|/getitemspec|/getitemperf" Server/server/servercommand.cpp
 ```
 
-## Regra pratica
+## Practical rule
 
-Se o problema for "qual valor eu coloco no comando?", pense assim:
+If the problem is "which value do I put in the command?", think of it this way:
 
-- para comando GM de item: `CodeIMG1`
-- para packet/log/source antigo: `IDCode`
-- para achar no banco pela descricao humana: `Name`
-- para drop table: `Items` com uma lista de `CodeIMG1`
+- GM item command: use `CodeIMG1`
+- packet/log/older source path: use `IDCode`
+- human-friendly lookup: use `Name`
+- drop table `Items` field: use a list of `CodeIMG1` values

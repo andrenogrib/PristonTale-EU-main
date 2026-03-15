@@ -1,138 +1,138 @@
 # Client Localhost Patch Guide
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Este guia explica o ajuste que tivemos que fazer no `game.dll` para o client local conseguir logar no server rodando na sua maquina.
+This guide explains the runtime adjustment that was required in `game.dll` so the local client could connect to the server running on the same machine.
 
-## O problema
+## The problem
 
-Mesmo com o source apontando para localhost, o client binario que veio dentro de `Files/Game/` ainda podia estar compilado para um IP antigo de producao.
+Even when the source code points to localhost, the runtime client inside `Files/Game/` may still be compiled for an older production IP.
 
-Sintoma tipico:
+Typical symptom:
 
-- o login server esta online
-- o game server esta online
-- voce abre `Files/Game/Game.exe`
-- digita login e senha corretos
-- aparece `connection failed`
+- the login server is online
+- the game server is online
+- you open `Files/Game/Game.exe`
+- you enter correct credentials
+- the client still shows `connection failed`
 
-## Por que isso acontece
+## Why this happens
 
-O que manda no runtime pronto e o binario que o jogo esta usando naquele momento.
+The runtime binary is what actually matters.
 
-Ou seja:
+That means:
 
-- o source pode estar certo
-- os `.ini` podem estar certos
-- mas, se `Files/Game/game.dll` ainda estiver apontando para IP publico, o `Game.exe` vai tentar conectar no lugar errado
+- the source can be correct
+- the `.ini` files can be correct
+- but if `Files/Game/game.dll` still points to a public server, `Game.exe` will connect to the wrong place
 
-## O que foi feito neste repo
+## What was found in this repository
 
-No ambiente local que montamos, o `game.dll` do runtime pack tinha uma referencia ao IP:
+In the working local environment for this repository, `game.dll` still contained:
 
 ```text
 15.204.184.155
 ```
 
-E o ambiente local precisava falar com:
+But the local environment needed:
 
 ```text
 127.0.0.1
 ```
 
-Por isso foi criado o script:
+That is why the script below exists:
 
 - `scripts/patch-pt-client-localhost.ps1`
 
-## O que o script faz
+## What the script does
 
-Ele:
+It:
 
-- abre `Files/Game/game.dll`
-- procura a string ASCII do IP antigo
-- troca pelo IP local
-- cria um backup automatico `game.dll.bak`
-- valida se a troca realmente aconteceu
+- opens `Files/Game/game.dll`
+- searches for the old ASCII IP string
+- replaces it with the local IP
+- creates a backup named `game.dll.bak`
+- verifies that the replacement really happened
 
-## Como rodar
+## How to run it
 
 ```powershell
 .\scripts\patch-pt-client-localhost.ps1
 ```
 
-Se o script encontrar varias ocorrencias e voce quiser trocar todas:
+If the script finds multiple matches and you want all of them replaced:
 
 ```powershell
 .\scripts\patch-pt-client-localhost.ps1 -Force
 ```
 
-## Como saber se precisa rodar
+## How to tell whether you need it
 
-Normalmente voce precisa rodar quando:
+You usually need this patch when:
 
-- copiou um runtime pack novo para `Files/`
-- o repo original veio preparado para um servidor remoto
-- o jogo abre, mas a conexao falha mesmo com os servers locais online
+- you copied in a fresh runtime pack under `Files/`
+- the original runtime was built for a remote production server
+- the game opens, but connection fails even though your local servers are online
 
-Se o script disser que o client ja aponta para `127.0.0.1`, nao precisa fazer mais nada.
+If the script says the client already points to `127.0.0.1`, no extra action is needed.
 
-## O que o script nao faz
+## What the script does not do
 
-Ele nao:
+It does not:
 
-- compila o client
-- muda o source C++
-- altera o `server.ini`
-- cria conta
-- restaura banco
+- compile the client
+- change the C++ source
+- edit `server.ini`
+- create accounts
+- restore databases
 
-Ele so corrige o alvo de conexao do `game.dll` binario.
+It only patches the actual runtime target inside the binary `game.dll`.
 
-## Ordem recomendada no primeiro setup
+## Recommended order during first-time setup
 
 1. `.\scripts\start-pt-docker-sql.ps1`
 2. `.\scripts\restore-pt-docker-dbs.ps1`
 3. `.\scripts\patch-pt-client-localhost.ps1`
 4. `.\scripts\fix-pt-local-runtime.ps1`
 5. `.\scripts\start-pt-server.ps1`
-6. abrir `Files/Game/Game.exe`
+6. open `Files/Game/Game.exe`
 
-## Como voltar atras
+## How to roll back
 
-O script salva um backup:
+The script creates:
 
 ```text
 Files/Game/game.dll.bak
 ```
 
-Se voce precisar desfazer:
+To revert:
 
-1. feche o jogo
-2. substitua `game.dll` pelo `game.dll.bak`
+1. close the game
+2. replace `game.dll` with `game.dll.bak`
 
-## Dica importante para quem usar o repo original
+## Important note for anyone using the original repository with a fresh runtime pack
 
-Sempre trate `Files/` como runtime separado do source.
+Always treat `Files/` as a runtime layer separate from the source tree.
 
-Na pratica:
+In practice:
 
-- o repo pode dizer uma coisa
-- o binario do runtime pode estar apontando para outra
+- the repository may say one thing
+- the binary runtime may still point somewhere else
 
-Entao, quando copiar um runtime pack externo, faca estes checks:
+When you copy in a runtime pack from another environment, check these items:
 
-1. `server.ini` do login server
-2. `server.ini` do game server
-3. `game.dll` do client
-4. banco restaurado
-5. contas de teste
+1. `server.ini` in the login server runtime
+2. `server.ini` in the game server runtime
+3. `game.dll` in the client runtime
+4. restored databases
+5. local test accounts
 
-## Quando suspeitar que o problema e o `game.dll`
+## When to suspect `game.dll`
 
-Suspeite do `game.dll` quando:
+Suspect the runtime DLL when:
 
-- o login server recebe conexoes, mas o client falha antes de entrar
-- o source esta configurado para localhost
-- o runtime pack veio de outro ambiente
+- the servers are online
+- the source is already configured for localhost
+- the client still fails before the login server receives a login attempt
 
-Se isso acontecer, rode o patch antes de sair mexendo no source.
+If that happens, patch the runtime before you start changing source files.

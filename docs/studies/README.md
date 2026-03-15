@@ -1,18 +1,18 @@
 # Studies
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta pasta e para estudos mais profundos e investigacoes que nao sao guias nem referencias rapidas.
+This folder is for deeper investigations that are not yet stable guides or quick references.
 
-Coloque aqui, por exemplo:
+Examples of material that belongs here:
 
-- levantamento de schema de banco por modulo
-- estudo de pacotes de rede
-- investigacao de anti-cheat
-- mapeamento de formatos binarios e `.chr`
-- comparacoes entre source e runtime pack
+- database schema studies by subsystem
+- packet and network analysis
+- anti-cheat investigation notes
+- binary format mapping such as `.chr`
+- source versus runtime comparison work
 
-Regra pratica:
+Practical rule:
 
-- se o material for exploratorio, experimental ou de pesquisa, ele entra em `docs/studies/`
-- quando um estudo virar procedimento estavel, crie ou atualize uma doc em `docs/guides/` ou `docs/reference/`
+- if the material is exploratory, experimental, or research-oriented, it belongs in `docs/studies/`
+- once that work turns into a stable procedure, move or mirror the important parts into `docs/guides/` or `docs/reference/`

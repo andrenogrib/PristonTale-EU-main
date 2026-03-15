@@ -1,12 +1,12 @@
 # Scripts Handbook
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Este guia explica, em linguagem direta, o que cada script do repo faz, quando usar e qual comando copiar.
+This guide explains, in plain English, what each repository script does, when to use it, and which command to copy.
 
-## Ordem mais comum de uso
+## Most common usage order
 
-Para subir o ambiente local do zero:
+To boot the local environment from scratch:
 
 1. `.\scripts\start-pt-docker-sql.ps1`
 2. `.\scripts\restore-pt-docker-dbs.ps1`
@@ -14,92 +14,87 @@ Para subir o ambiente local do zero:
 4. `.\scripts\fix-pt-local-runtime.ps1`
 5. `.\scripts\start-pt-server.ps1`
 
-Para desligar:
+To shut everything down:
 
 1. `.\scripts\stop-pt-server.ps1`
 2. `.\scripts\stop-pt-docker-sql.ps1`
 
-## Resumo rapido
+## Quick summary
 
-| Script | O que faz | Quando usar |
+| Script | What it does | When to use it |
 | --- | --- | --- |
-| `start-pt-docker-sql.ps1` | sobe o SQL Server em Docker | antes de restaurar ou usar o banco |
-| `stop-pt-docker-sql.ps1` | para o SQL em Docker | quando terminar os testes |
-| `restore-pt-docker-dbs.ps1` | restaura os bancos e garante a conta `admin` | no primeiro setup ou quando quiser voltar ao estado base |
-| `patch-pt-client-localhost.ps1` | corrige o `game.dll` para localhost | quando o client aponta para IP errado |
-| `fix-pt-local-runtime.ps1` | aplica workarounds do ambiente local | quando o runtime vier quebrado ou apos restore |
-| `start-pt-server.ps1` | abre janelas para login server e game server | para rodar o servidor |
-| `watch-pt-server.ps1` | acompanha o `Log.txt` em tempo real | e chamado pelo script de start |
-| `stop-pt-server.ps1` | fecha `Server.exe`, janelas de monitor e `AutoRestart.bat` | para desligar tudo do projeto |
-| `provision-pt-test-account.ps1` | cria ou atualiza uma conta com GM e vincula um char | quando quiser uma conta de teste propria |
-| `assign-pt-character-to-account.ps1` | move um char existente para uma conta | quando o char existe mas esta em outra conta |
-| `clone-pt-character-template.ps1` | cria char novo clonando um template pronto | quando o client nao consegue criar personagem |
-| `find-pt-item.ps1` | procura item por nome, code ou ID | quando precisar usar `/getitem` |
-| `find-pt-map.ps1` | procura mapa por nome, short name ou ID | quando precisar usar `/wrap` |
-| `find-pt-monster.ps1` | procura monstro por nome ou ID | quando precisar ajustar spawn, exp ou drop |
-| `export-pt-reference-docs.ps1` | gera markdowns de mapa, item e monstro | quando quiser atualizar as docs de referencia |
+| `start-pt-docker-sql.ps1` | starts SQL Server in Docker | before restoring or using the database |
+| `stop-pt-docker-sql.ps1` | stops SQL in Docker | when testing is finished |
+| `restore-pt-docker-dbs.ps1` | restores the databases and guarantees the `admin` account | during first setup or when returning to a clean baseline |
+| `patch-pt-client-localhost.ps1` | patches `game.dll` to localhost | when the client still points to the wrong IP |
+| `fix-pt-local-runtime.ps1` | applies known local runtime workarounds | after restore or when the runtime is dirty |
+| `start-pt-server.ps1` | opens monitor windows for the login and game servers | when you want the server online |
+| `watch-pt-server.ps1` | tails `Log.txt` in real time | used internally by the start script |
+| `stop-pt-server.ps1` | stops `Server.exe`, monitor windows, and `AutoRestart.bat` | when you want to shut the project down cleanly |
+| `provision-pt-test-account.ps1` | creates or updates a GM-enabled test account | when you want your own local test login |
+| `assign-pt-character-to-account.ps1` | moves an existing character to a target account | when a character exists but belongs to the wrong account |
+| `clone-pt-character-template.ps1` | clones a template character into a new character | when client-side character creation is unreliable |
+| `find-pt-item.ps1` | looks up an item by name, item code, or numeric ID | before using `/getitem` or related commands |
+| `find-pt-map.ps1` | looks up maps by name, short name, or map ID | before using `/wrap` |
+| `find-pt-monster.ps1` | looks up monsters by name or ID | before changing monster EXP, drop, or spawn data |
+| `export-pt-reference-docs.ps1` | regenerates markdown references and the ID section | after database or runtime changes |
 
-## Scripts de banco e infraestrutura
+## Database and infrastructure scripts
 
 ### `start-pt-docker-sql.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- verifica se o Docker esta pronto
-- abre o Docker Desktop se necessario
-- cria ou sobe o container `priston-sql`
-- expoe a porta `1433`
-- monta `Files/DBS/extracted` dentro do container
-- espera o SQL aceitar conexao
-
-Quando usar:
-
-- sempre antes de restaurar bancos
-- sempre antes de scripts que dependem de SQL
+- verifies Docker readiness
+- opens Docker Desktop if needed
+- creates or starts the `priston-sql` container
+- exposes port `1433`
+- mounts `Files/DBS/extracted` into the container
+- waits for SQL to accept connections
 
 ### `stop-pt-docker-sql.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\stop-pt-docker-sql.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- para o container `priston-sql`
+- stops the `priston-sql` container
 
-## Scripts de banco e contas
+## Database and account scripts
 
 ### `restore-pt-docker-dbs.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\restore-pt-docker-dbs.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- restaura `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew` e `UserDB`
-- cria `ChatDB` e `SkillDB` se nao existirem
-- recria ou atualiza a conta `admin`
+- restores `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew`, and `UserDB`
+- creates `ChatDB` and `SkillDB` if they do not exist
+- recreates or updates the `admin` account
 
-Observacao importante:
+Important note:
 
-- ele sobrescreve o `UserDB`
-- isso significa que contas customizadas feitas depois podem sumir
-- se isso acontecer, rode `provision-pt-test-account.ps1` de novo
+- it overwrites `UserDB`
+- that means accounts created later can disappear
+- if that happens, run `provision-pt-test-account.ps1` again
 
 ### `provision-pt-test-account.ps1`
 
-Exemplo:
+Example:
 
 ```powershell
 .\scripts\provision-pt-test-account.ps1 `
@@ -110,17 +105,17 @@ Exemplo:
   -GameMasterLevel 4
 ```
 
-O que ele faz:
+What it does:
 
-- cria ou atualiza a conta
-- gera o hash correto da senha
-- seta a conta como ativa
-- aplica GM
-- vincula o char informado
+- creates or updates the account
+- writes the correct password hash
+- sets the account as active
+- applies GM permissions
+- binds the chosen character
 
 ### `assign-pt-character-to-account.ps1`
 
-Exemplo:
+Example:
 
 ```powershell
 .\scripts\assign-pt-character-to-account.ps1 `
@@ -128,128 +123,128 @@ Exemplo:
   -CharacterName 'test_ps_100'
 ```
 
-O que ele faz:
+What it does:
 
-- muda o dono do personagem existente
+- changes the owner of an existing character
 
 ### `clone-pt-character-template.ps1`
 
-Exemplo:
+Example:
 
 ```powershell
 .\scripts\clone-pt-character-template.ps1 `
   -AccountName 'dedezin' `
-  -NewCharacterName 'MeuPike' `
+  -NewCharacterName 'MyPike' `
   -TemplateCharacterName 'test_ps_100' `
   -GameMasterLevel 4
 ```
 
-O que ele faz:
+What it does:
 
-- copia uma linha de `CharacterInfo`
-- copia o `.chr` do personagem template
-- cria um char novo jogavel
+- copies a `CharacterInfo` row from a working template
+- copies the template `.chr` file
+- creates a new playable local test character
 
-## Scripts de correcao do runtime
+## Runtime correction scripts
 
 ### `patch-pt-client-localhost.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\patch-pt-client-localhost.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- corrige `Files/Game/game.dll`
-- troca o IP antigo pelo `127.0.0.1`
-- cria `game.dll.bak`
+- patches `Files/Game/game.dll`
+- replaces the old runtime IP with `127.0.0.1`
+- creates `game.dll.bak`
 
-Quando usar:
+Use it when:
 
-- quando vier um runtime pack novo
-- quando acontecer `connection failed`
+- you copied in a new runtime pack
+- the client still shows `connection failed`
 
 ### `fix-pt-local-runtime.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\fix-pt-local-runtime.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- corrige o gold do `Administrador` para evitar o cheat `99007`
-- remove timers invalidos de premium
-- vincula personagens de teste conhecidos a uma conta
-- garante que os `.chr` de teste existam na pasta certa
+- reduces `Administrador` gold to avoid cheat `99007`
+- removes broken premium timer rows
+- binds known test characters to a working account
+- ensures the known `.chr` files are present
 
-Quando usar:
+Use it when:
 
-- logo apos restaurar o banco
-- quando o runtime local vier com sujeira antiga
+- you just restored the database
+- the runtime looks dirty or inconsistent
 
-## Scripts para ligar e desligar o servidor
+## Server control scripts
 
 ### `start-pt-server.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\start-pt-server.ps1
 ```
 
-Opcional, ja abrindo o client:
+Optionally open the client too:
 
 ```powershell
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
 
-Opcional, usando `AutoRestart.bat`:
+Optionally use `AutoRestart.bat`:
 
 ```powershell
 .\scripts\start-pt-server.ps1 -UseAutoRestart
 ```
 
-O que ele faz:
+What it does:
 
-- abre uma janela PowerShell para o login server
-- abre outra janela PowerShell para o game server
-- em cada janela, acompanha o `Log.txt`
+- opens one PowerShell window for the login server
+- opens one PowerShell window for the game server
+- tails the corresponding `Log.txt` files in those windows
 
 ### `watch-pt-server.ps1`
 
-Esse script normalmente nao e rodado direto.
-Ele e usado pelo `start-pt-server.ps1`.
+This script is normally not run directly.
+It is called by `start-pt-server.ps1`.
 
-O que ele faz:
+What it does:
 
-- inicia o `Server.exe`
-- ou inicia o `AutoRestart.bat`
-- deixa a janela parada no `Log.txt`
+- starts `Server.exe`
+- or starts `AutoRestart.bat`
+- keeps the window attached to `Log.txt`
 
 ### `stop-pt-server.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\stop-pt-server.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- fecha `Server.exe` do login server
-- fecha `Server.exe` do game server
-- fecha as janelas de monitor
-- fecha o `AutoRestart.bat` se estiver em uso
+- stops the login server `Server.exe`
+- stops the game server `Server.exe`
+- closes the monitor windows
+- closes `AutoRestart.bat` if it is running
 
-## Scripts de consulta rapida
+## Quick lookup scripts
 
 ### `find-pt-item.ps1`
 
-Exemplos:
+Examples:
 
 ```powershell
 .\scripts\find-pt-item.ps1 -Search "Abyss Axe"
@@ -257,14 +252,14 @@ Exemplos:
 .\scripts\find-pt-item.ps1 -Search "16854272"
 ```
 
-Quando usar:
+Use it:
 
-- antes de `/getitem`
-- antes de editar drop ou item distributor
+- before `/getitem`
+- before editing drop or distributor data
 
 ### `find-pt-map.ps1`
 
-Exemplos:
+Examples:
 
 ```powershell
 .\scripts\find-pt-map.ps1 -Search "Ricarten"
@@ -272,49 +267,50 @@ Exemplos:
 .\scripts\find-pt-map.ps1 -Search "3"
 ```
 
-Quando usar:
+Use it:
 
-- antes de `/wrap`
-- para descobrir `mapId`
+- before `/wrap`
+- when you need a `mapId`
 
 ### `find-pt-monster.ps1`
 
-Exemplos:
+Examples:
 
 ```powershell
 .\scripts\find-pt-monster.ps1 -Search "Kelvezu"
 .\scripts\find-pt-monster.ps1 -Search "1188"
 ```
 
-Quando usar:
+Use it:
 
-- antes de mexer em exp de monstro
-- antes de mexer em drop
-- antes de comandos SQL de monster
+- before changing monster EXP
+- before changing drop behavior
+- before using monster SQL commands
 
 ### `export-pt-reference-docs.ps1`
 
-Comando:
+Command:
 
 ```powershell
 .\scripts\export-pt-reference-docs.ps1
 ```
 
-O que ele faz:
+What it does:
 
-- gera `docs/reference/map-id-reference.md`
-- gera `docs/reference/item-id-reference.md`
-- gera `docs/reference/monster-id-reference.md`
+- regenerates `docs/reference/map-id-reference.md`
+- regenerates `docs/reference/item-id-reference.md`
+- regenerates `docs/reference/monster-id-reference.md`
+- regenerates the dedicated ID section under `docs/reference/ids/`
 
-Quando usar:
+Use it:
 
-- depois de atualizar o banco
-- depois de trocar runtime pack
-- quando quiser regenerar as listas para consulta
+- after changing the database
+- after switching to another runtime pack
+- when you want refreshed markdown lookup tables
 
-## Fluxos prontos
+## Ready-to-use flows
 
-### Primeiro setup local
+### First-time local setup
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
@@ -324,7 +320,7 @@ Quando usar:
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
 
-### Restaurou tudo e perdeu sua conta customizada
+### Restore finished and your custom account disappeared
 
 ```powershell
 .\scripts\provision-pt-test-account.ps1 `
@@ -335,17 +331,17 @@ Quando usar:
   -GameMasterLevel 4
 ```
 
-### Quer criar um novo char de teste
+### Create a new local test character
 
 ```powershell
 .\scripts\clone-pt-character-template.ps1 `
   -AccountName 'dedezin' `
-  -NewCharacterName 'MeuPike' `
+  -NewCharacterName 'MyPike' `
   -TemplateCharacterName 'test_ps_100' `
   -GameMasterLevel 4
 ```
 
-## Onde encontrar mais detalhes
+## Related docs
 
 - `docs/guides/server-start-guide.md`
 - `docs/guides/setup-run-test-guide.md`

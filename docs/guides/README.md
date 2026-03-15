@@ -1,26 +1,22 @@
 # Guides
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta pasta concentra guias operacionais e passo a passo.
+This folder contains step-by-step operational guides and repeatable procedures.
 
-Coloque aqui:
+Place documents here when they answer questions such as:
 
-- setup de ambiente
-- ordem de start e stop
-- runbooks de teste local
-- procedimentos repetiveis de operacao
+- how do I set up the environment?
+- how do I start and stop the server?
+- how do I test the local runtime?
+- how do I repeat a known operational workflow from start to finish?
 
-Regra pratica:
+## Current guides
 
-- se a doc responde "como eu faco isso do inicio ao fim?", ela provavelmente entra em `docs/guides/`
-
-## Guias atuais
-
-- `docs/guides/server-start-guide.md`: ligar, acompanhar logs e desligar o server
-- `docs/guides/setup-run-test-guide.md`: setup local completo do zero
-- `docs/guides/gm-handbook.md`: manual pratico para usar GM/Admin dentro do jogo
-- `docs/guides/account-and-character-management.md`: contas, GM level, clone de personagem e edicao via DB
-- `docs/guides/client-localhost-patch-guide.md`: explica o patch do `game.dll` para localhost
-- `docs/guides/scripts-handbook.md`: explica todos os scripts criados no repo
-- `docs/guides/events-and-rates-guide.md`: eventos, EXP, drop, manutencao e bonus globais
+- `docs/guides/server-start-guide.md`: start, monitor, and stop the local server
+- `docs/guides/setup-run-test-guide.md`: full local setup and validation guide
+- `docs/guides/gm-handbook.md`: practical GM/Admin handbook for in-game operations
+- `docs/guides/account-and-character-management.md`: account creation, GM levels, character ownership, and DB edits
+- `docs/guides/client-localhost-patch-guide.md`: explains the `game.dll` localhost patch
+- `docs/guides/scripts-handbook.md`: explains every repository script in plain English
+- `docs/guides/events-and-rates-guide.md`: EXP, drop, events, buffs, and maintenance operations

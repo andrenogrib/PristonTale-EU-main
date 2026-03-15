@@ -1,96 +1,97 @@
-# Analise do pacote Files
+# Files Runtime Pack Analysis
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Escopo desta analise:
+Scope of this analysis:
 
-- source do client em `game/`
-- source do server em `Server/`
-- runtime pack em `Files/`
-- bancos em `Files/DBS`
-- clan web em `Files/ClanSystem`
-- IIS/PHP empacotados em `Files/Inetpub`
+- client source in `game/`
+- server source in `Server/`
+- runtime pack in `Files/`
+- database backups in `Files/DBS`
+- clan web system in `Files/ClanSystem`
+- IIS/PHP bundle in `Files/Inetpub`
 
-Docs relacionadas:
+Related docs:
 
 - `docs/guides/setup-run-test-guide.md`
+- `docs/guides/client-localhost-patch-guide.md`
 - `docs/reference/server-commands-reference.md`
 - `docs/reference/item-code-and-data-reference.md`
 
-## Visao geral
+## Overview
 
-- O projeto tem source C++ do client e do server.
-- Para teste local inicial, compilar nao e obrigatorio, porque ja existem binarios prontos dentro de `Files/`.
-- Os binarios principais encontrados foram:
+- The project contains C++ source code for both the client and the server.
+- For initial local testing, compiling is not required because `Files/` already contains working binaries.
+- The main runtime binaries found in the pack were:
   - `Files/Server/login-server/Server.exe`
   - `Files/Server/game-server/Server.exe`
   - `Files/Game/Game.exe`
-- O runtime pack nao esta 100% sincronizado com a source atual.
+- The runtime pack is not fully synchronized with the current source tree.
 
-## Estrutura do runtime pack
+## Runtime pack structure
 
-- `Files/Game`: client jogavel, assets e `Game.exe`.
-- `Files/Server/login-server`: login server, `server.ini`, `Server.exe`, `Log.txt`.
-- `Files/Server/game-server`: game server, `server.ini`, `Server.exe`, `Log.txt`.
-- `Files/DBS`: backups e arquivos ligados aos bancos.
-- `Files/ClanSystem`: paginas ASP do sistema de clan.
-- `Files/Inetpub`: pacote com estrutura de IIS/PHP esperada pelo clan web.
+- `Files/Game`: playable client, assets, and `Game.exe`
+- `Files/Server/login-server`: login server runtime, `server.ini`, `Server.exe`, `Log.txt`
+- `Files/Server/game-server`: game server runtime, `server.ini`, `Server.exe`, `Log.txt`
+- `Files/DBS`: database backups and related files
+- `Files/ClanSystem`: ASP pages for the clan web system
+- `Files/Inetpub`: IIS/PHP layout expected by the clan web system
 
-## Configuracao de rede
+## Network configuration
 
-- A source do client esta preparada para `127.0.0.1`.
-- O mundo principal encontrado no source e `Babel`.
-- Porta do login server: `10009`.
-- Porta do game server: `10007`.
-- Os dois `server.ini` tambem apontam para localhost.
+- The client source is configured for `127.0.0.1`.
+- The main world name found in the source is `Babel`.
+- Login server port: `10009`
+- Game server port: `10007`
+- The runtime `server.ini` files also point to localhost in the current local setup.
 
-Conclusao pratica:
+Practical conclusion:
 
-- A source esta montada para teste local na mesma maquina, desde que o SQL Server e os bancos estejam corretos.
-- O runtime real do client precisa ser validado antes do teste, porque `Files/Game/game.dll` pode nao bater com a source.
+- The source tree is set up for local single-machine testing as long as SQL Server and the databases are aligned.
+- The real client runtime still needs to be validated, because `Files/Game/game.dll` may not match the source configuration.
 
-## Divergencia critica entre source e runtime
+## Critical mismatch between source and runtime
 
-Durante o teste local foi encontrado um motivo concreto para o erro `connection failed` no client:
+During local testing, a real cause for the client-side `connection failed` error was found:
 
-- a source em `game/game/globals.h` e `game/game/CGameWorld.cpp` aponta para `127.0.0.1`
-- porem o runtime distribuido em `Files/Game/game.dll` ainda carregava o IP publico `15.204.184.155`
-- o `Game.exe` carrega esse `game.dll`, entao abrir o client nao significa necessariamente usar a configuracao que esta na source
+- the source files `game/game/globals.h` and `game/game/CGameWorld.cpp` point to `127.0.0.1`
+- however, the runtime `Files/Game/game.dll` still contained the public IP `15.204.184.155`
+- `Game.exe` loads that runtime DLL, so launching the client does not guarantee that the source configuration is what actually runs
 
-Impacto pratico:
+Practical impact:
 
-- o login `admin` / `admin` nem chegava ao `login-server`
-- os logs do `login-server` nao mostravam tentativa de autenticacao
-- o erro acontecia antes da validacao de conta e senha
+- `admin / admin` never reached the login server
+- the login server logs did not show any authentication attempt
+- the failure happened before account validation
 
-Correcao adotada:
+Adopted fix:
 
-- criar o script `scripts/patch-pt-client-localhost.ps1`
-- esse script faz backup de `Files/Game/game.dll`
-- depois substitui o IP antigo `15.204.184.155` por `127.0.0.1` dentro do binario distribuido
+- create `scripts/patch-pt-client-localhost.ps1`
+- back up `Files/Game/game.dll`
+- replace `15.204.184.155` with `127.0.0.1` inside the runtime DLL
 
-Conclusao pratica:
+Practical conclusion:
 
-- para teste local com o runtime pack atual, nao basta alinhar a source
-- e preciso alinhar tambem o binario real que o `Game.exe` carrega
+- for local testing with the current runtime pack, aligning the source is not enough
+- the actual runtime binary loaded by `Game.exe` also has to be aligned
 
-## Configuracao de banco
+## Database configuration
 
-Os dois arquivos abaixo usam a mesma configuracao de SQL:
+The runtime uses the same SQL configuration in both:
 
 - `Files/Server/login-server/server.ini`
 - `Files/Server/game-server/server.ini`
 
-Configuracao encontrada:
+In the current working local setup, both files point to:
 
-- Host: `(local)\SQLEXPRESS`
+- Host: `127.0.0.1,1433`
 - User: `sa`
 - Password: `632514Go`
-- Driver: `{SQL Server Native Client 11.0}`
+- Driver: `{ODBC Driver 17 for SQL Server}`
 
-## Bancos esperados pelo server
+## Databases expected by the server
 
-Pelo source, o server tenta abrir estes bancos:
+Based on the source, the server expects to open:
 
 - `GameDB`
 - `ServerDB`
@@ -103,9 +104,9 @@ Pelo source, o server tenta abrir estes bancos:
 - `ChatDB`
 - `UserDB`
 
-## Bancos encontrados no pacote
+## Databases found in the package
 
-Backups ou pacotes relacionados encontrados em `Files/DBS`:
+Backups or related database files found in `Files/DBS`:
 
 - `GameDB`
 - `ServerDB`
@@ -116,142 +117,142 @@ Backups ou pacotes relacionados encontrados em `Files/DBS`:
 - `ClanDB`
 - `UserDB`
 
-Bancos ausentes no pacote analisado:
+Not present in the analyzed package:
 
 - `ChatDB`
 - `SkillDB`
 - `SoD2DB`
 
-Conclusao pratica:
+Practical conclusion:
 
-- O server so tende a ficar limpo quando os nomes e schemas dos bancos baterem com o que o binario espera.
-- O pacote atual parece incompleto para todas as features, principalmente chat extra e parte de SoD/clan web.
+- The server becomes clean only when both database names and schemas match what the current binary expects.
+- The current package is incomplete for some features, especially extra chat functionality and parts of SoD/clan web.
 
-## ClanSystem e web
+## ClanSystem and web dependencies
 
-O sistema web de clan usa:
+The clan web system uses:
 
 - `Files/ClanSystem/Clan/settings.asp`
 - `Files/ClanSystem/Clan/SODsettings.asp`
 
-Foi encontrada a mesma instancia `(local)\SQLEXPRESS`, mas com senha diferente:
+It was originally found pointing to the same SQL instance but with a different password than the game server runtime.
 
-- User: `sa`
-- Password: `Dev@2681`
+Practical conclusion:
 
-Conclusao pratica:
+- If the clan web system is going to be used, the ASP files must be aligned with the same SQL host, user, and password used by the server runtime.
+- `Files/Inetpub` indicates a dependency on IIS with Classic ASP, CGI/FastCGI, and PHP 7.4.
 
-- Do jeito que esta, server e clan web nao usam a mesma senha.
-- Se for subir o clan web, os arquivos ASP precisam ficar alinhados com o mesmo host, user e password dos `server.ini`.
-- O pacote `Files/Inetpub` indica dependencia de IIS com Classic ASP, CGI/FastCGI e PHP 7.4.
+## Accounts and characters seen during investigation
 
-## Contas e personagens vistos nos logs
-
-Contas vistas em logs antigos:
+Accounts seen in older logs:
 
 - `test_fs_40`
 - `test_fs_20`
 
-Personagem visto nos logs:
+Character seen in older logs:
 
 - `Administrador`
 
-Limite importante:
+Important limit:
 
-- Nenhuma senha foi encontrada de forma confiavel nos arquivos inspecionados.
-- O log mostra tentativa falhada de `test_fs_20` e depois login bem-sucedido, mas nao revela a senha.
+- No original plaintext password could be recovered from the inspected files.
+- `UserInfo` stores password hashes, not readable plaintext passwords.
 
-Conclusao pratica:
+Practical conclusion:
 
-- Primeiro confira `UserDB.dbo.UserInfo`.
-- Se nao existir uma conta funcional depois da restauracao, a conta padrao recomendada para teste sera `admin` / `admin`.
+- Check `UserDB.dbo.UserInfo` first.
+- If no working account exists after restore, use the documented local test accounts.
 
-## Regras de login observadas no source
+## Login rules observed in the source
 
-O login depende de:
+Login depends on:
 
-- senha comparada com o valor gravado no banco, sem re-hash no server
-- o client faz `SHA-256` antes de enviar a senha
-- formula observada no client: `SHA256(UPPER(AccountName) + ":" + PlainPassword)`
-- `Flag` com:
+- the password hash stored in the database
+- the client hashing the password before sending it
+- the client-side formula `SHA256(UPPER(AccountName) + ":" + PlainPassword)`
+- `Flag` including:
   - `Activated = 2`
   - `AcceptedLatestTOA = 32`
   - `Approved = 64`
-- `MustConfirm` nao pode estar ligado
+- `MustConfirm` not being set
 
-Valor pratico para um usuario de teste:
+Practical value for a local test user:
 
-- `Flag = 114` nos usuarios de teste restaurados
+- `Flag = 114`
 
-Conclusao pratica:
+Practical conclusion:
 
-- as senhas vistas em `UserInfo` na base restaurada estao em hash SHA-256
-- por isso nao existe como ler a senha real de contas antigas so olhando a tabela
-- para um usuario novo de teste, o hash precisa ser gravado no mesmo formato do client
-- a conta de teste preparada para setup local continua sendo `admin` / `admin`
+- password values in the restored `UserInfo` table are SHA-256 hashes
+- old account passwords cannot be recovered from the database alone
+- new test accounts must use the same client-side hash format
 
-## Erros reais encontrados nos logs
+## Real errors found in the logs
 
-Os logs mostram que os binarios chegaram a subir, mas os bancos usados na epoca nao batiam com o schema esperado.
+The binaries were able to start, but the databases used in earlier attempts did not match the expected schema.
 
-Erros encontrados:
+Observed errors:
 
-- `MainQuestID` invalido em `GameDB`
-- `LevelUpDate` invalido em `UserDB`
-- `HasItem` e `Item` inconsistentes em `UserDB.dbo.ItemBox`
+- invalid `MainQuestID` in `GameDB`
+- invalid `LevelUpDate` in `UserDB`
+- inconsistent `HasItem` and `Item` fields in `UserDB.dbo.ItemBox`
+- missing `CleanUpOldChatLogs` procedure in `ChatDB`
+- date conversion failure during `LogDB` cleanup
 
-Conclusao pratica:
+Practical conclusion:
 
-- Restaurar qualquer backup com nome correto nao basta.
-- O schema precisa ser o schema compativel com este binario/source.
+- Restoring a database backup with the correct name is not enough.
+- The schema must match the schema expected by this runtime.
 
-## Estado da maquina usada nesta analise
+## Host machine state during investigation
 
-Na maquina em que a inspecao foi feita, o estado observado foi:
+At investigation time, the relevant host state was:
 
-- sem servico `MSSQL$SQLEXPRESS` ativo
-- sem IIS configurado
-- driver ODBC encontrado: `SQL Server`
+- no local `MSSQL$SQLEXPRESS` service in use for the working setup
+- no IIS configured
+- `ODBC Driver 17 for SQL Server` available and working
 
-Impacto:
+Impact:
 
-- se o `SQL Server Native Client 11.0` nao estiver instalado, pode ser necessario trocar os dois `server.ini` para `Driver={SQL Server}`
-- IIS e PHP so sao obrigatorios se quiser subir o clan/painel web
-- com o driver generico `SQL Server`, o login funcionou, mas alguns `INSERT` parametrizados falharam com `HY104` e `07002`
-- o caso mais importante foi a criacao de personagem em `CharacterInfo`
-- para contornar isso no teste local, o workaround principal virou `scripts/fix-pt-local-runtime.ps1`
+- `ODBC Driver 17 for SQL Server` removed the earlier bind failures such as `HY104` and `07002`
+- the remaining boot-time errors are now schema and missing routine issues, not driver issues
+- IIS and PHP are only required if the clan web stack is needed
 
-Detalhe tecnico confirmado:
+## Character creation behavior
 
-- o `SQLConnection::BindParameterInput()` usa `SQLBindParameter(..., iLen, 0, pParameter, 0, ...)`
-- no `SQLCharacterInsert()`, os campos `Seasonal` e `GMLevel` sao enviados como `PARAMTYPE_Byte`
-- no driver ODBC generico isso estourou `HY104` e depois `07002` ao inserir em `CharacterInfo` e `CharacterLog`
-- por isso o login pode funcionar e a criacao de personagem falhar na mesma sessao
+The current runtime history showed an important distinction:
 
-Impacto pratico:
+- login could work
+- character creation could still fail
 
-- a conta `admin` consegue logar
-- mas criar personagem novo pode deixar lixo em `CharacterItemTimer` e nao gravar a linha em `CharacterInfo`
-- o workaround mais seguro no runtime atual e usar personagens ja existentes no banco e no pacote `Files`
+Why that happened:
 
-Correcao operacional aplicada:
+- the server runtime uses ODBC parameter binding that is sensitive to driver compatibility
+- with the generic `{SQL Server}` driver, some `tinyint`/byte parameter paths failed during `CharacterInfo` and `CharacterLog` inserts
 
-- reduzir o gold do `Administrador` para abaixo do limite anti-cheat
-- limpar timers invalidos de premium criados por tentativa de personagem incompleta
-- vincular personagens de teste conhecidos a `admin`
-- consolidar isso em `scripts/fix-pt-local-runtime.ps1`
+Practical impact seen during local testing:
 
-Limite atual:
+- `admin` could log in
+- creating a new character could fail and leave broken timer data behind
+- the safest workaround was to use existing characters already present in the runtime pack
 
-- a correcao definitiva para criacao de personagem novo ainda depende de usar um driver ODBC compativel com o binario atual, como `SQL Server Native Client 11.0` ou `ODBC Driver 17 for SQL Server`
+Operational workaround already applied in this repository:
 
-## Versionamento do runtime pack
+- reduce `Administrador` gold below the anti-cheat limit
+- clean invalid premium timer rows
+- bind known test characters to a working account
+- capture the workaround in `scripts/fix-pt-local-runtime.ps1`
 
-- `Files/` ocupa cerca de `10.9 GB`
-- os maiores arquivos individuais vistos ficaram na faixa de `25 MB` a `70 MB`
-- mesmo sem muitos arquivos acima de `100 MB`, o pacote completo e grande demais para um fluxo simples de GitHub
+Current limitation:
 
-Recomendacao:
+- a fully clean character creation flow still depends on perfect database/runtime alignment
+- the local environment is currently stable for login and GM testing, but not yet fully clean for every schema-dependent feature
 
-- manter no Git apenas source, docs, scripts e ajustes pequenos de configuracao
-- tratar `Files/` como pacote local, release asset, storage externo ou Git LFS se realmente precisar versionar os binarios
+## Runtime pack versioning
+
+- `Files/` occupies about `10.9 GB`
+- even if many individual files are not extremely large, the pack as a whole is too large for a simple GitHub source-only workflow
+
+Recommendation:
+
+- keep source code, documentation, scripts, and small config changes in Git
+- treat `Files/` as a local runtime pack, release asset, external storage payload, or Git LFS target if binary versioning is truly required

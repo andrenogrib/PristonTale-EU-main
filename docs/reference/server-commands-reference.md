@@ -1,60 +1,60 @@
 # Server Commands Reference
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta doc mapeia os comandos definidos em `Server/server/servercommand.cpp` e `Server/server/servercommand.h`.
-O foco aqui e facilitar tres coisas:
+This document maps the commands defined in `Server/server/servercommand.cpp` and `Server/server/servercommand.h`.
+Its goal is to make three things easier:
 
-- saber qual comando existe e em qual nivel de GM ele entra
-- descobrir rapidamente onde mexer em item, drop, EXP, monstro e manutencao
-- achar o ponto de source certo quando voce precisar aprofundar
+- identify which command exists and which GM level can use it
+- find the fastest way to adjust items, drop data, EXP, monsters, and maintenance behavior
+- jump to the correct source location when you need to investigate further
 
-Se voce quer o jeito mais facil de usar esses comandos dentro do jogo, leia antes:
+If you want the most practical in-game usage guide first, read:
 
 - `docs/guides/gm-handbook.md`
 - `docs/guides/events-and-rates-guide.md`
 - `docs/guides/account-and-character-management.md`
 
-Se voce precisa descobrir `mapId`, `itemCode` ou `MonsterID` para usar junto dos comandos, use:
+If you need `mapId`, `itemCode`, or `MonsterID` values to use with those commands, check:
 
 - `docs/reference/map-id-reference.md`
 - `docs/reference/item-id-reference.md`
 - `docs/reference/monster-id-reference.md`
 
-## Fonte de verdade
+## Source Of Truth
 
 - Chat commands: `Server/server/servercommand.cpp`
-- Comandos internos em fila SQL: `Server/server/servercommand.h`
-- Niveis de GM: `shared/user.h`
-- Ativacao e despacho dos comandos: `Server/server/servercommand.cpp`
+- Internal SQL queue commands: `Server/server/servercommand.h`
+- GM levels: `shared/user.h`
+- Command activation and dispatch: `Server/server/servercommand.cpp`
 
-Os handlers ficam organizados assim:
+The handlers are organized like this:
 
-- `OnGameMasterAdminCommand`: bloco Admin / GM4
+- `OnGameMasterAdminCommand`: Admin / GM4 block
 - `OnGameMasterLevel1Command`: GM1
 - `OnGameMasterLevel2Command`: GM2
 - `OnGameMasterLevel3Command`: GM3
-- `OnPlayerCommand`: comandos de player
-- `OnGameMasterCommand`: dispatcher geral
+- `OnPlayerCommand`: player commands
+- `OnGameMasterCommand`: global dispatcher
 
-## Como ativar os comandos
+## How To Activate Commands
 
-No ambiente local que montamos, a conta `admin` esta configurada com `GameMasterType=1` e `GameMasterLevel=4`.
+In the local environment documented in this repository, the `admin` account is configured with `GameMasterType=1` and `GameMasterLevel=4`.
 
-Fluxo normal:
+Normal flow:
 
-1. abra o jogo
-2. logue com `admin` / `admin`
-3. escolha o personagem `Administrador`
-4. rode `/activategm`
+1. open the game
+2. log in with `admin` / `admin`
+3. select the `Administrador` character
+4. run `/activategm`
 
-Para sair do modo GM:
+To leave GM mode:
 
 - `/deactivategm`
 
-## Hierarquia de GM
+## GM Hierarchy
 
-Os niveis estao em `shared/user.h`:
+The levels are defined in `shared/user.h`:
 
 - `GAMELEVEL_None = 0`
 - `GAMELEVEL_One = 1`
@@ -62,47 +62,47 @@ Os niveis estao em `shared/user.h`:
 - `GAMELEVEL_Three = 3`
 - `GAMELEVEL_Four = 4`
 
-O dispatcher aplica a heranca assim:
+The dispatcher applies inheritance like this:
 
-- GM4 herda GM1 + GM2 + GM3 + Admin
-- GM3 herda GM1 + GM2 + GM3
-- GM2 herda GM1 + GM2
-- GM1 herda GM1
+- GM4 inherits GM1 + GM2 + GM3 + Admin
+- GM3 inherits GM1 + GM2 + GM3
+- GM2 inherits GM1 + GM2
+- GM1 inherits GM1
 
-## Comandos mais usados no dia a dia
+## Most Common Day-To-Day Commands
 
-### Item, gold e inventario
+### Item, Gold, And Inventory
 
 - `/getitem <itemCode> [classShort] [specAtk 1-3] [age 1-20] [rarity 0-5] [perfect 1]`
-  - cria o item direto no inventario do GM
+  - creates the item directly in the GM inventory
 - `/getitemold <...>`
-  - igual ao anterior, mas busca definicao em `ItemListOld`
-- `/giveitem <loginDaConta> <itemCode>`
-  - envia o item para o Item Distributor da conta
-  - apesar da mensagem antiga falar `account id`, o codigo usa o login da conta
+  - same idea, but resolves through `ItemListOld`
+- `/giveitem <accountLogin> <itemCode>`
+  - sends the item to the account item distributor
+  - even though the old message says `account id`, the code uses the account login
 - `/getitemperf <itemCode> <spec>`
-  - cria item perfeito
+  - creates a perfect item
 - `/getitemspec <itemCode> <spec> <lvatk>`
-  - cria item com spec custom
+  - creates an item with custom spec values
 - `/GetGold <valor>`
-  - adiciona gold ao personagem atual
+  - adds gold to the current character
 - `/getmpg`, `/gethpg`, `/getspg`, `/getmp`, `/gethp`, `/getsp`
-  - geram potions
+  - generate potion items
 
-### EXP, level e taxa do servidor
+### EXP, Level, And Server-Wide Rates
 
 - `/!giveexp <valor>`
-  - adiciona EXP bruta ao personagem atual
+  - adds raw EXP to the current character
 - `/!levelup <level>`
-  - sobe para o EXP daquele level
+  - raises the character to the EXP value for that level
 - `/expevent <0-1000>`
-  - altera o bonus global de EXP em porcentagem
+  - changes the global EXP bonus percentage
 - `/extradrop <qtd>`
-  - aumenta a quantidade extra de drops por monstro
+  - increases the extra drop count per monster
 - `/BONUSALL`
-  - aplica buffs premium em todos os players, incluindo EXP buff e Drop buff
+  - applies premium-style buffs to all online players, including EXP and drop buffs
 
-### Mapa, teleport e GM tools
+### Map, Teleport, And GM Tools
 
 - `/wrap <mapId> <x> <z>`
 - `/near <char>`
@@ -112,7 +112,7 @@ O dispatcher aplica a heranca assim:
 - `/hide`
 - `/show`
 
-### Manutencao e moderacao
+### Maintenance And Moderation
 
 - `/!mute <char> "<reason>"`
 - `/!unmute <char>`
@@ -122,9 +122,9 @@ O dispatcher aplica a heranca assim:
 - `/StartMaintenance`
 - `/StopMaintenance`
 
-## Comandos internos em fila SQL
+## Internal SQL Queue Commands
 
-Esses nao sao chat commands. Eles aparecem no enum `ESQLServerCommand` em `Server/server/servercommand.h` e representam operacoes internas lidas do banco:
+These are not chat commands. They appear in the `ESQLServerCommand` enum in `Server/server/servercommand.h` and represent internal operations consumed from the database:
 
 - `10`: `SQLSERVERCOMMAND_ChangeCharacterName`
 - `11`: `SQLSERVERCOMMAND_ChangeCharacterLevel`
@@ -137,13 +137,13 @@ Esses nao sao chat commands. Eles aparecem no enum `ESQLServerCommand` em `Serve
 - `111`: `SQLSERVERCOMMAND_LoadCheatList`
 - `121`: `SQLSERVERCOMMAND_LoadMixFormula`
 
-## Indice completo por escopo
+## Full Index By Scope
 
-O objetivo desta secao e ser o catalogo rapido. Para sintaxe detalhada, sempre confira o bloco do comando em `Server/server/servercommand.cpp`.
+The goal of this section is to be the fast command catalog. For exact syntax, always inspect the corresponding block in `Server/server/servercommand.cpp`.
 
 ### GM4 Admin
 
-#### Admin, utilitarios e debug
+#### Admin, Utilities, And Debug
 
 - `/!unmute_and_reset`
 - `/rarity_update`, `/Rarity_Update`
@@ -184,7 +184,7 @@ O objetivo desta secao e ser o catalogo rapido. Para sintaxe detalhada, sempre c
 - `/SetFrameCounterUnit`
 - `/!HWCombination`
 
-#### Item, potion, item distributor e temp item
+#### Item, Potion, Distributor, And Temp Item
 
 - `/giveitem`
 - `/getquestitem`
@@ -242,7 +242,7 @@ O objetivo desta secao e ser o catalogo rapido. Para sintaxe detalhada, sempre c
 - `/ItemSemiPerf`
 - `/getitemperf`
 
-#### EXP, drop, PVP e eventos globais
+#### EXP, Drop, PvP, And Global Events
 
 - `/!giveexp`
 - `/!levelup`
@@ -269,7 +269,7 @@ O objetivo desta secao e ser o catalogo rapido. Para sintaxe detalhada, sempre c
 - `/event_crystal`
 - `/!tradechat_free`
 
-#### SoD, Bellatra, Bless Castle e arenas
+#### SoD, Bellatra, Bless Castle, And Arenas
 
 - `/SetOwnerBC`
 - `/ClearOwnerBC`
@@ -311,7 +311,7 @@ O objetivo desta secao e ser o catalogo rapido. Para sintaxe detalhada, sempre c
 - `/gf_monevent`
 - `/gf_kick`
 
-#### Mundo, teleport, NPC, monstro vivo e manutencao
+#### World, Teleport, NPC, Live Monster, And Maintenance
 
 - `/add_map_indicator_script`
 - `/remove_map_indicator`
@@ -361,9 +361,9 @@ O objetivo desta secao e ser o catalogo rapido. Para sintaxe detalhada, sempre c
 - `/StopMaintenance`
 - `/KillUnitsMap`
 
-#### SQL live edit de monstro
+#### Live Monster SQL Editing
 
-Esses comandos consultam ou alteram um monstro ja spawnado e persistem a alteracao no banco:
+These commands read or change a monster that is already spawned and persist the change back to the database:
 
 - `/sql_HP`
 - `/sql_Size`
@@ -403,7 +403,7 @@ Esses comandos consultam ou alteram um monstro ja spawnado e persistem a alterac
 - `/sql_SkillArea`
 - `/sql_Level`
 
-#### Bots, sockets e rede
+#### Bots, Sockets, And Network
 
 - `/BotCreate`
 - `/BotDelete`
@@ -414,7 +414,7 @@ Esses comandos consultam ou alteram um monstro ja spawnado e persistem a alterac
 - `/ServerCrash`, `/!ServerCrash`
 - `/NetServerDC`, `/!NetServerDC`
 
-#### Social e observacao
+#### Social And Observation
 
 - `/spymember`
 - `/notspymember`
@@ -429,10 +429,10 @@ Esses comandos consultam ou alteram um monstro ja spawnado e persistem a alterac
 - `/!mute`
 - `/!unmute`
 
-Notas:
+Notes:
 
-- `/mute` e `/unmute` servem so para redirecionar o operador ao formato `!/login-server`
-- o mute real entra via login server
+- `/mute` and `/unmute` only redirect the operator to the `!/login-server` format
+- the actual mute handling is performed through the login server
 
 ### GM2
 
@@ -449,9 +449,9 @@ Notas:
 - `/kickch`, `/!kickch`
 - `/grant_title`
 
-Nota:
+Note:
 
-- `/field` aparece no source, mas o bloco esta comentado. Trate como comando desativado na build atual.
+- `/field` appears in the source, but the block is commented out. Treat it as disabled in the current build.
 
 ### GM3
 
@@ -480,19 +480,19 @@ Nota:
 - `/activategm`
 - `/deactivategm`
 
-## Onde procurar a sintaxe exata
+## Where To Find The Exact Syntax
 
-Receita pratica:
+Practical recipe:
 
-1. procure o comando em `Server/server/servercommand.cpp`
-2. abra o bloco do `if ( COMMAND("...", pszBuff) )`
-3. leia os `GetParameterString(...)`
-4. veja se o comando:
-   - roda no game server
-   - roda no login server
-   - redireciona via `NETSERVER->SendGMCommandToLoginServer(...)`
+1. search for the command in `Server/server/servercommand.cpp`
+2. open the corresponding `if ( COMMAND("...", pszBuff) )` block
+3. read the `GetParameterString(...)` calls
+4. verify whether the command:
+   - runs on the game server
+   - runs on the login server
+   - redirects through `NETSERVER->SendGMCommandToLoginServer(...)`
 
-Comandos uteis para procurar no repo:
+Useful searches:
 
 ```powershell
 rg -n 'COMMAND\\(' Server/server/servercommand.cpp
@@ -500,10 +500,10 @@ rg -n '/getitem|/giveitem|/expevent|/extradrop' Server/server/servercommand.cpp
 rg -n 'OnGameMasterAdminCommand|OnGameMasterLevel1Command|OnGameMasterLevel2Command|OnGameMasterLevel3Command' Server/server/servercommand.cpp
 ```
 
-## Observacoes importantes
+## Important Notes
 
-- O macro `COMMAND` usa `StrCmpPT`, entao o source e a referencia final para o nome exato aceito.
-- Alguns comandos existem em alias de caixa alta/baixa.
-- Alguns comandos mexem em monstro spawnado no mapa, nao no cadastro base por nome.
-- Alguns comandos foram feitos para dev/teste e podem ser perigosos em servidor aberto.
-- Para item e drop, a outra doc util e `docs/reference/item-code-and-data-reference.md`.
+- The `COMMAND` macro uses `StrCmpPT`, so the source is still the final authority for the exact accepted name.
+- Some commands exist in multiple upper/lowercase aliases.
+- Some commands operate on a currently spawned monster, not the base monster definition by name.
+- Some commands were clearly built for dev/testing and can be dangerous on a public server.
+- For item and drop lookup, the companion document is `docs/reference/item-code-and-data-reference.md`.

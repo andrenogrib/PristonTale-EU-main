@@ -1,46 +1,46 @@
 # Events And Rates Guide
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Este guia explica como mexer em bonus de EXP, drop, eventos sazonais e manutencao.
+This guide explains how to manage EXP bonuses, drop bonuses, seasonal events, and maintenance operations.
 
-## Dois jeitos de mexer em rates
+## Two ways to control rates
 
-Neste projeto existem dois caminhos principais:
+In this project, rates can be controlled in two main places:
 
-- configuracao fixa em `Files/Server/game-server/server.ini`
-- comando de GM dentro do jogo
+- fixed startup configuration in `Files/Server/game-server/server.ini`
+- live runtime changes through GM commands inside the game
 
-## Rates do `server.ini`
+## Rates in `server.ini`
 
-No `server.ini` do game server, os campos mais importantes hoje estao no bloco `[Event]`.
+The main rate-related keys currently live under the `[Event]` section.
 
-Exemplos do ambiente local:
+Examples from the local setup:
 
 - `RateExp=1`
 - `EventExp=0`
 - `WantedMoriph=Off`
 - `WantedWolf=Off`
 - `Easter=Off`
-- `Xmas=off`
+- `Xmas=Off`
 - `Halloween=Off`
 - `ValentineDay=Off`
 
-Leitura pratica:
+Practical reading:
 
-- `RateExp=1` significa taxa base de EXP
-- os flags `On` e `Off` sao o estado inicial do server ao subir
-- comandos de GM podem mudar o estado em runtime
+- `RateExp=1` is the base EXP rate
+- `On` / `Off` values define the startup state
+- GM commands can still change runtime state after the server is already online
 
-## Bonus de EXP global
+## Global EXP bonus
 
-Comando:
+Command:
 
 ```text
 /expevent <0-1000>
 ```
 
-Exemplos:
+Examples:
 
 ```text
 /expevent 0
@@ -48,21 +48,21 @@ Exemplos:
 /expevent 300
 ```
 
-Leitura:
+Meaning:
 
-- `0` = sem bonus extra
+- `0` = no extra EXP bonus
 - `100` = `+100%`
 - `300` = `+300%`
 
-## Bonus de drop
+## Extra drop count
 
-Comando:
+Command:
 
 ```text
-/extradrop <qtd>
+/extradrop <count>
 ```
 
-Exemplos:
+Examples:
 
 ```text
 /extradrop 0
@@ -70,40 +70,40 @@ Exemplos:
 /extradrop 2
 ```
 
-Leitura:
+Meaning:
 
-- isso muda a quantidade extra de drops gerados
-- isso nao e a mesma coisa que editar a chance base no banco
+- this changes the extra number of drops generated
+- it does not necessarily change the base chance weight in the database tables
 
-## Bonus premium em todos os players
+## Premium buffs for every online player
 
-Comando:
+Command:
 
 ```text
 /BONUSALL
 ```
 
-Esse comando aplica, para todos os jogadores online:
+This applies premium-style buffs to every online player, including:
 
-- regen HP
-- regen MP
-- regen SP
+- HP regen
+- MP regen
+- SP regen
 - damage bonus
 - absorb bonus
-- move speed
+- movement speed
 - EXP buff
 - drop buff
 
-## Eventos simples com `true` ou `false`
+## Simple on/off events
 
-Os comandos abaixo seguem o padrao:
+Many event commands follow this pattern:
 
 ```text
-/comando true
-/comando false
+/command true
+/command false
 ```
 
-### Aging
+### Aging-related events
 
 ```text
 /event_agingfree true
@@ -111,13 +111,13 @@ Os comandos abaixo seguem o padrao:
 /event_aginghalfprice true
 ```
 
-Uso:
+Meaning:
 
-- `agingfree`: aging sem custo
-- `agingnobreak`: aging sem quebrar
-- `aginghalfprice`: aging com preco reduzido
+- `agingfree`: no cost for aging
+- `agingnobreak`: no break chance
+- `aginghalfprice`: reduced aging cost
 
-### Eventos sazonais e tematicos
+### Seasonal and themed events
 
 ```text
 /event_Halloween true
@@ -130,9 +130,9 @@ Uso:
 /event_girl true
 ```
 
-Para desligar, troque `true` por `false`.
+To turn them off, replace `true` with `false`.
 
-### Outros eventos simples
+### Other live toggles
 
 ```text
 /event_reducemondmg true
@@ -140,14 +140,14 @@ Para desligar, troque `true` por `false`.
 /event_treasurehunting true
 ```
 
-## Eventos especiais Wanted
+## Wanted events
 
-Estes dois aceitam formas mais avancadas:
+These two commands support more advanced syntax:
 
 - `/event_WantedMoriph`
 - `/event_WantedWolf`
 
-Usos aceitos pelo source:
+Accepted patterns found in the source:
 
 ```text
 /event_WantedMoriph true
@@ -165,33 +165,33 @@ Usos aceitos pelo source:
 /event_WantedWolf titles
 ```
 
-Leitura:
+Meaning:
 
-- `true`: liga
-- `false`: desliga
-- `true <spawn count> <spawn delay>`: liga com ajuste de spawn
-- `reset`: reseta estatisticas de kill
-- `titles`: distribui titulos por kills
+- `true`: enable the event
+- `false`: disable the event
+- `true <spawn count> <spawn delay>`: enable with spawn tuning
+- `reset`: reset kill statistics
+- `titles`: distribute title rewards based on kills
 
-## PVP em runtime
+## PvP runtime controls
 
-### Definir mapa de PVP
+### Set the PvP map
 
 ```text
 /PVPMap <mapId>
 ```
 
-Para desativar, o source aceita `-1`.
+The source also accepts `-1` to disable it.
 
-### Ajustar escalas de PVP
+### Adjust PvP scaling values
 
-O comando base e:
+Base syntax:
 
 ```text
-/pvp <chave> <valor>
+/pvp <key> <value>
 ```
 
-Exemplos encontrados no source:
+Examples found in the source:
 
 ```text
 /pvp dmg_scale_lvl 1.20
@@ -199,60 +199,57 @@ Exemplos encontrados no source:
 /pvp global_dmg_reduction 0.10
 ```
 
-Observacao:
+This block supports multiple keys, so use the full command reference if you need fine-grained PvP tuning.
 
-- esse bloco tem varias chaves
-- para ajuste fino, confirme a lista completa em `docs/reference/server-commands-reference.md`
+## Maintenance mode
 
-## Manutencao
-
-Iniciar contagem:
+Start a countdown:
 
 ```text
 /StartMaintenance 300
 ```
 
-Cancelar:
+Cancel it:
 
 ```text
 /StopMaintenance
 ```
 
-O que acontece:
+What happens:
 
-- o game server avisa os jogadores
-- a informacao e enviada para o login server
-- a contagem e iniciada nos dois lados
+- the game server sends global notices
+- the login server is notified too
+- the countdown is started on both sides
 
-## Quando usar ini e quando usar comando
+## When to use the INI and when to use live commands
 
-Use `server.ini` quando:
+Use `server.ini` when:
 
-- voce quer o valor padrao do server
-- quer que o valor ja suba com o server
+- you want the default startup state
+- you want the setting applied every time the server boots
 
-Use comando de GM quando:
+Use GM commands when:
 
-- voce quer mudar em tempo real
-- quer testar evento sem reiniciar
-- quer fazer acao temporaria
+- you want to change behavior live
+- you want to test an event without restarting
+- you want a temporary event window
 
-## Fluxos prontos
+## Ready-to-use examples
 
-### Ligar evento de EXP para teste
+### Turn on an EXP event
 
 ```text
 /expevent 100
 ```
 
-### Ligar drop extra e buff premium
+### Turn on extra drops and premium buffs
 
 ```text
 /extradrop 2
 /BONUSALL
 ```
 
-### Fazer fim de semana de aging
+### Run an aging weekend
 
 ```text
 /event_agingfree true
@@ -260,35 +257,34 @@ Use comando de GM quando:
 /event_aginghalfprice true
 ```
 
-### Fazer evento sazonal
+### Run a seasonal event
 
 ```text
 /event_Halloween true
 ```
 
-ou
+or
 
 ```text
 /event_Christmas true
 ```
 
-### Encerrar manutencao
+### Stop maintenance
 
 ```text
 /StopMaintenance
 ```
 
-## Boas praticas
+## Good operational habits
 
-- anote o valor antigo antes de mudar
-- mude uma coisa por vez
-- se o efeito for global, avise os jogadores
-- use a conta de teste primeiro quando o evento mexer com drop ou exp
-- se mudar o `server.ini`, reinicie o server para o valor fixo entrar
+- write down the previous value before changing a global setting
+- change one thing at a time
+- announce global event changes to players if the server is live
+- test on a development account first when the event changes EXP or drop behavior
+- if you change `server.ini`, restart the server so the fixed startup state takes effect
 
-## Referencias uteis
+## Related docs
 
 - `docs/guides/gm-handbook.md`
 - `docs/reference/server-commands-reference.md`
-- `docs/reference/map-id-reference.md`
-- `docs/reference/monster-id-reference.md`
+- `docs/reference/ids/README.md`

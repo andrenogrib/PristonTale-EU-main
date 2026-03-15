@@ -1,217 +1,208 @@
 # GM Handbook
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Este guia e o manual pratico para quem vai administrar o servidor dentro do jogo.
-Ele foi escrito pensando em alguem que nao conhece o source nem o banco.
+This is the practical handbook for running the server as a GM or Admin inside the game.
+It is written for someone who does not want to read the source code before using the runtime.
 
-Use esta doc junto com:
+Use this guide together with:
 
-- `docs/reference/server-commands-reference.md`: lista completa dos comandos encontrados no source
-- `docs/reference/map-id-reference.md`: IDs de mapa com nome
-- `docs/reference/item-id-reference.md`: item codes com nome
-- `docs/reference/monster-id-reference.md`: IDs de monstro com nome
-- `docs/guides/events-and-rates-guide.md`: eventos, bonus, rates e manutencao
+- `docs/reference/server-commands-reference.md`
+- `docs/reference/ids/README.md`
+- `docs/guides/events-and-rates-guide.md`
 
-## O que e GM e o que e Admin
+## What GM and Admin mean here
 
-No banco existem dois controles principais:
+At the account level:
 
-- `GameMasterType`: liga ou desliga a permissao de GM na conta
-- `GameMasterLevel`: define o nivel do GM, de `1` ate `4`
+- `GameMasterType` enables GM access
+- `GameMasterLevel` sets the GM level from `1` to `4`
 
-No personagem tambem existe:
+At the character level:
 
-- `CharacterInfo.GMLevel`: nivel de GM salvo no personagem
+- `CharacterInfo.GMLevel` stores the character-side GM level
 
-Na pratica, no ambiente local deste repo:
+In this local environment:
 
-- `GameMasterType = 1` significa que a conta pode usar GM
-- `GameMasterLevel = 4` significa Admin / GM4
-- GM4 herda comandos de GM1, GM2, GM3 e Admin
+- `GameMasterType = 1` means the account is allowed to use GM mode
+- `GameMasterLevel = 4` means GM4 / Admin
+- GM4 inherits GM1, GM2, GM3, and Admin commands
 
-## Antes de usar qualquer comando
+## Before using any GM command
 
-Sempre siga esta ordem:
+Always follow this order:
 
-1. ligue o server
-2. entre no jogo
-3. escolha o personagem
-4. ative o modo GM com `/activategm`
+1. start the server
+2. log into the game
+3. select a character
+4. enable GM mode with `/activategm`
 
-Se der certo, o chat deve avisar algo como `GM level X activated`.
+If it works, the chat should report that your GM level was activated.
 
-Para sair do modo GM:
+To leave GM mode:
 
 ```text
 /deactivategm
 ```
 
-## Como ler a sintaxe dos comandos
+## How to read command syntax
 
-Quando a documentacao mostrar algo assim:
+If the documentation shows:
 
 ```text
 /getitem <itemCode> [classShort] [specAtk] [age]
 ```
 
-Leia assim:
+Read it like this:
 
-- tudo que esta entre `< >` e obrigatorio
-- tudo que esta entre `[ ]` e opcional
-- voce precisa digitar a barra `/`
-- o comando e digitado no chat do jogo
+- anything inside `< >` is required
+- anything inside `[ ]` is optional
+- you must type the leading `/`
+- commands are entered in the in-game chat
 
-## Fluxos prontos do dia a dia
+## Common day-to-day workflows
 
-### 1. Teleportar para um mapa
+### Teleport to a map
 
-Voce precisa de:
-
-- `mapId`
-- coordenadas `x` e `z`
-
-Comando:
+Command:
 
 ```text
 /wrap <mapId> <x> <z>
 ```
 
-Exemplo:
+Example:
 
 ```text
 /wrap 3 0 0
 ```
 
-Observacao importante:
+Important note:
 
-- o ID do mapa voce acha em `docs/reference/map-id-reference.md`
-- as coordenadas dependem do mapa
-- se voce nao souber uma coordenada segura, prefira usar `/near <char>` para ir ate um personagem online
+- find the map ID in `docs/reference/ids/map-ids.md`
+- coordinates depend on the map
+- if you do not know a safe coordinate, `/near <char>` is often the safer choice
 
-### 2. Ir ate um personagem ou puxar ele ate voce
+### Move to a character or pull a character to you
 
-Ir ate a pessoa:
-
-```text
-/near NomeDoPersonagem
-```
-
-Puxar a pessoa ate voce:
+Move to a player:
 
 ```text
-/call NomeDoPersonagem
+/near CharacterName
 ```
 
-### 3. Criar item para voce
+Pull a player to your position:
 
-Passo 1:
+```text
+/call CharacterName
+```
 
-- ache o item code em `docs/reference/item-id-reference.md`
-- ou use `.\scripts\find-pt-item.ps1 -Search "nome do item"`
+### Create an item for yourself
 
-Passo 2:
+Step 1:
 
-- rode o comando no jogo
+- find the item code in `docs/reference/ids/equipment-item-ids.md`, `potion-item-ids.md`, or `other-item-ids.md`
+- or use `.\scripts\find-pt-item.ps1 -Search "item name"`
 
-Exemplo simples:
+Step 2:
+
+- run the command in the game
+
+Simple example:
 
 ```text
 /getitem wa131
 ```
 
-Esse exemplo usa o item code da `Abyss Axe`.
+That example uses the item code for `Abyss Axe`.
 
-Exemplo para enviar item ao distribuidor da conta:
+Send an item to an account distributor:
 
 ```text
 /giveitem dedezin wa131
 ```
 
-Exemplo de item perfeito:
+Create a perfect item:
 
 ```text
 /getitemperf wa131 1
 ```
 
-### 4. Dar gold
+### Add gold
 
 ```text
 /GetGold 1000000
 ```
 
-Isso adiciona gold ao personagem atual.
+This adds gold to the current character.
 
-## 5. Dar EXP ou subir level
+### Add EXP or raise level
 
-Adicionar EXP bruta:
+Add raw EXP:
 
 ```text
 /!giveexp 100000000
 ```
 
-Subir para o level informado:
+Raise the current character to a target level:
 
 ```text
 /!levelup 100
 ```
 
-Observacao:
+Practical note:
 
-- o comando de level sobe o personagem atual para a EXP daquele level
-- para o level aparecer corretamente, entre no mapa, troque de mapa ou relogue se necessario
+- the level command moves the character to the EXP value for that level
+- if the displayed level does not refresh instantly, change map or relog
 
-### 6. Aumentar EXP do servidor e quantidade de drop
+### Increase server EXP and drop output
 
-Bonus de EXP global:
+Global EXP bonus:
 
 ```text
 /expevent 100
 ```
 
-Leitura:
+Meaning:
 
-- `100` significa `+100%`
-- `0` desliga o bonus
+- `100` means `+100%`
+- `0` disables the runtime bonus
 
-Quantidade extra de drops:
+Extra drop count:
 
 ```text
 /extradrop 2
 ```
 
-Leitura:
+Meaning:
 
-- isso aumenta a quantidade extra de itens gerados por monstro
-- isso nao significa, necessariamente, mudar a chance base da tabela
+- this increases the number of extra drops generated by monsters
+- it does not necessarily rewrite the base drop weight table
 
-### 7. Aplicar bonus premium em todo mundo
+### Apply premium buffs to everyone online
 
 ```text
 /BONUSALL
 ```
 
-Esse comando aplica buffs premium para todos os jogadores online naquele momento, incluindo bonus de EXP e drop.
+This applies premium-style buffs, including EXP and drop buffs, to all currently online players.
 
-### 8. Abrir manutencao
+### Start maintenance
 
-Contagem de 5 minutos:
+Start a 5-minute countdown:
 
 ```text
 /StartMaintenance 300
 ```
 
-Cancelar:
+Cancel it:
 
 ```text
 /StopMaintenance
 ```
 
-## Eventos mais usados
+## Most common event toggles
 
-Os eventos mais comuns aceitam `true` ou `false`.
-
-Exemplos:
+Examples:
 
 ```text
 /event_agingfree true
@@ -225,90 +216,93 @@ Exemplos:
 /event_reducemondmg true
 ```
 
-Para detalhes de cada um, use `docs/guides/events-and-rates-guide.md`.
+For the detailed event guide, use:
 
-## Moderacao
+- `docs/guides/events-and-rates-guide.md`
 
-Mutar jogador:
+## Moderation basics
+
+Mute:
 
 ```text
-/!mute NomeDoChar "motivo"
+/!mute CharacterName "reason"
 ```
 
-Desmutar:
+Unmute:
 
 ```text
-/!unmute NomeDoChar
+/!unmute CharacterName
 ```
 
 Kick:
 
 ```text
-/kickch NomeDoChar
+/kickch CharacterName
 ```
 
-Banir conta:
+Ban account:
 
 ```text
-/banacc NomeDoChar motivo
+/banacc CharacterName reason
 ```
 
-Desbanir conta:
+Unban account:
 
 ```text
-/unbanacc LoginDaConta
+/unbanacc AccountLogin
 ```
 
-## Como descobrir IDs e nomes sem decorar nada
+## How to find IDs without memorizing them
 
-### Itens
+### Items
 
-Arquivos e utilitarios:
+Use:
 
-- `docs/reference/item-id-reference.md`
-- `docs/reference/item-code-and-data-reference.md`
+- `docs/reference/ids/equipment-item-ids.md`
+- `docs/reference/ids/potion-item-ids.md`
+- `docs/reference/ids/other-item-ids.md`
 - `.\scripts\find-pt-item.ps1 -Search "Abyss Axe"`
 
-### Mapas
+### Maps
 
-Arquivos e utilitarios:
+Use:
 
-- `docs/reference/map-id-reference.md`
+- `docs/reference/ids/map-ids.md`
 - `.\scripts\find-pt-map.ps1 -Search "Ricarten"`
 - `.\scripts\find-pt-map.ps1 -Search "3"`
 
-### Monstros
+### Monsters
 
-Arquivos e utilitarios:
+Use:
 
-- `docs/reference/monster-id-reference.md`
+- `docs/reference/ids/monster-ids-by-level.md`
 - `.\scripts\find-pt-monster.ps1 -Search "Kelvezu"`
 - `.\scripts\find-pt-monster.ps1 -Search "1188"`
 
-## Regras de seguranca para GM
+## Safe GM habits
 
-- sempre confirme se o comando vai afetar so voce, um player, o mapa atual ou o servidor inteiro
-- teste primeiro com uma conta de desenvolvimento
-- evite mexer em rates globais no meio de teste de banco
-- antes de mudar evento global, anote o valor antigo
-- antes de apagar ou transferir personagem, confirme o nome da conta no banco
+- always confirm whether a command affects only you, one player, the current map, or the whole server
+- test global changes on a development account first
+- avoid mixing rate experiments with database troubleshooting
+- write down the old value before changing a global setting
+- confirm account and character names before reassigning ownership
 
-## Se algo der errado
+## If something goes wrong
 
-Os problemas mais comuns estao em:
+The most common issues are documented in:
 
 - `docs/troubleshooting/local-runtime-known-issues.md`
 
-Os sintomas mais comuns sao:
+Typical symptoms:
 
 - `connection failed`
 - `incorrect password`
-- personagem sem pertencer a conta
-- evento ligado mas sem efeito por causa de banco ou schema
+- character does not belong to the account
+- an event is enabled but does not behave as expected because of database/runtime mismatch
 
-## Referencia completa
+## Full reference
 
-Esta doc e um handbook pratico.
-Para a lista completa dos comandos encontrados em `Server/server/servercommand.cpp`, use:
+This handbook is the practical layer.
+For the full command catalog extracted from `Server/server/servercommand.cpp`, use:
 
 - `docs/reference/server-commands-reference.md`

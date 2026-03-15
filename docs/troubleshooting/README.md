@@ -1,18 +1,19 @@
 # Troubleshooting
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Esta pasta e para incidentes, erros recorrentes e correcoes operacionais.
+This folder is for recurring issues, incidents, and operational fixes.
 
-Coloque aqui, por exemplo:
+Place documents here when they answer questions such as:
 
-- erro de login ou `connection failed`
-- falha de criacao de personagem
-- incompatibilidade de driver ODBC
-- problemas de schema entre banco e binario
-- sintomas, causa raiz, workaround e correcao definitiva
+- why did the login fail?
+- why does the client show `connection failed`?
+- why does character creation break?
+- which schema mismatch is causing this runtime error?
 
-Regra pratica:
+Good troubleshooting docs should describe:
 
-- se a pergunta for "deu erro, como diagnosticar e corrigir?", esse material deve morar em `docs/troubleshooting/`
-- se a mesma correcao virar parte do fluxo normal, referencie tambem a doc correspondente em `docs/guides/`
+- the symptom
+- the root cause
+- the current workaround
+- the preferred long-term fix

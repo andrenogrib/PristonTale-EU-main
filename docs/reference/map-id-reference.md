@@ -1,8 +1,8 @@
 # Map ID Reference
 
-Atualizado em: 2026-03-15
+Updated on: 2026-03-15
 
-Gerado automaticamente por `scripts/export-pt-reference-docs.ps1` a partir de `shared/map.h` e `GameDB.dbo.MapList`.
+Generated automatically by `scripts/export-pt-reference-docs.ps1` from `shared/map.h` and `GameDB.dbo.MapList`.
 
 | ID | EnumName | Name | ShortName | TypeMap | LevelReq | Pvp | StageFile |
 | --- | --- | --- | --- | --- | --- | --- | --- |
