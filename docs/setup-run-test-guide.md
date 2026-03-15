@@ -22,6 +22,7 @@ Ao final deste guia voce deve conseguir:
 
 Obrigatorio para subir server:
 
+- abra o PowerShell como Administrador
 - SQL Server Express com instancia `SQLEXPRESS`
 - SSMS para restaurar os backups
 - autenticacao mista habilitada no SQL Server
@@ -46,6 +47,21 @@ Para o client, pode ser necessario:
 
 - DirectX 9 runtime, caso faltem DLLs como `d3dx9` ou `dsound`
 
+Comandos uteis via `winget`:
+
+```powershell
+winget install -e --id Microsoft.SQLServer.2022.Express --accept-source-agreements --accept-package-agreements
+winget install -e --id Microsoft.SQLServer.2012.NativeClient --accept-source-agreements --accept-package-agreements
+winget install -e --id Microsoft.SQLServerManagementStudio.22 --accept-source-agreements --accept-package-agreements
+winget install -e --id Microsoft.Sqlcmd --accept-source-agreements --accept-package-agreements
+```
+
+Observacao:
+
+- o `winget` do SQL Express pode abrir o bootstrapper da Microsoft
+- se isso acontecer, mantenha a instancia `SQLEXPRESS`
+- se o driver Native Client 11 nao for instalado, lembre de trocar o `Driver` dos `server.ini` para `{SQL Server}`
+
 ## 2. Restaurar os bancos
 
 1. Extraia os arquivos em `Files/DBS`.
@@ -60,6 +76,10 @@ Para o client, pode ser necessario:
 - `ItemDB`
 - `ClanDB`
 - `UserDB`
+
+Observacao:
+
+- os arquivos `.bak` podem ficar centralizados em `Files/DBS/extracted`
 
 Observacoes:
 
@@ -229,6 +249,8 @@ Para parar tudo:
 ```powershell
 .\scripts\stop-pt-server.ps1
 ```
+
+Antes de rodar, confirme que o servico `MSSQL$SQLEXPRESS` esta instalado e iniciado.
 
 ## 7. Ordem correta de start
 
