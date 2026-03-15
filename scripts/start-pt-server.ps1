@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $watchScript = Join-Path $PSScriptRoot 'watch-pt-server.ps1'
 
 $servers = @(
@@ -31,7 +31,7 @@ foreach ($server in $servers) {
         throw "Nao encontrei '$serverExePath'."
     }
 
-    $serverExePaths += (Resolve-Path $serverExePath).Path
+    $serverExePaths += (Resolve-Path -LiteralPath $serverExePath | Select-Object -First 1 -ExpandProperty Path)
 }
 
 $runningServerProcesses = Get-CimInstance Win32_Process | Where-Object {

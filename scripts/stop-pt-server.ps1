@@ -3,19 +3,19 @@ param()
 
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $repoRootRegex = [Regex]::Escape($repoRoot)
 
 $serverExePaths = @()
 $candidateServerDirs = @(
-    Join-Path $repoRoot 'Files\Server\login-server',
-    Join-Path $repoRoot 'Files\Server\game-server'
+    (Join-Path $repoRoot 'Files\Server\login-server')
+    (Join-Path $repoRoot 'Files\Server\game-server')
 )
 
 foreach ($serverDir in $candidateServerDirs) {
     $serverExePath = Join-Path $serverDir 'Server.exe'
     if (Test-Path $serverExePath) {
-        $serverExePaths += (Resolve-Path $serverExePath).Path
+        $serverExePaths += (Resolve-Path -LiteralPath $serverExePath | Select-Object -First 1 -ExpandProperty Path)
     }
 }
 

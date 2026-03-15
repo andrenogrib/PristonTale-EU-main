@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$resolvedServerDir = (Resolve-Path $ServerDir).Path
+$resolvedServerDir = Resolve-Path -LiteralPath $ServerDir | Select-Object -First 1 -ExpandProperty Path
 $serverExePath = Join-Path $resolvedServerDir 'Server.exe'
 $serverBatPath = Join-Path $resolvedServerDir 'AutoRestart.bat'
 $logPath = Join-Path $resolvedServerDir 'Log.txt'

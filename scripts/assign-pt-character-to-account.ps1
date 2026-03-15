@@ -10,7 +10,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $chrPath = Join-Path $repoRoot "Files\Server\login-server\Data\Character\$CharacterName.chr"
 
 if (-not (Test-Path $chrPath)) {

@@ -13,9 +13,9 @@ Escopo desta analise:
 
 Docs relacionadas:
 
-- `docs/setup-run-test-guide.md`
-- `docs/server-commands-reference.md`
-- `docs/item-code-and-data-reference.md`
+- `docs/guides/setup-run-test-guide.md`
+- `docs/reference/server-commands-reference.md`
+- `docs/reference/item-code-and-data-reference.md`
 
 ## Visao geral
 
@@ -219,7 +219,31 @@ Impacto:
 - IIS e PHP so sao obrigatorios se quiser subir o clan/painel web
 - com o driver generico `SQL Server`, o login funcionou, mas alguns `INSERT` parametrizados falharam com `HY104` e `07002`
 - o caso mais importante foi a criacao de personagem em `CharacterInfo`
-- para contornar isso no teste local, foi criado o script `scripts/assign-pt-character-to-account.ps1`
+- para contornar isso no teste local, o workaround principal virou `scripts/fix-pt-local-runtime.ps1`
+
+Detalhe tecnico confirmado:
+
+- o `SQLConnection::BindParameterInput()` usa `SQLBindParameter(..., iLen, 0, pParameter, 0, ...)`
+- no `SQLCharacterInsert()`, os campos `Seasonal` e `GMLevel` sao enviados como `PARAMTYPE_Byte`
+- no driver ODBC generico isso estourou `HY104` e depois `07002` ao inserir em `CharacterInfo` e `CharacterLog`
+- por isso o login pode funcionar e a criacao de personagem falhar na mesma sessao
+
+Impacto pratico:
+
+- a conta `admin` consegue logar
+- mas criar personagem novo pode deixar lixo em `CharacterItemTimer` e nao gravar a linha em `CharacterInfo`
+- o workaround mais seguro no runtime atual e usar personagens ja existentes no banco e no pacote `Files`
+
+Correcao operacional aplicada:
+
+- reduzir o gold do `Administrador` para abaixo do limite anti-cheat
+- limpar timers invalidos de premium criados por tentativa de personagem incompleta
+- vincular personagens de teste conhecidos a `admin`
+- consolidar isso em `scripts/fix-pt-local-runtime.ps1`
+
+Limite atual:
+
+- a correcao definitiva para criacao de personagem novo ainda depende de usar um driver ODBC compativel com o binario atual, como `SQL Server Native Client 11.0` ou `ODBC Driver 17 for SQL Server`
 
 ## Versionamento do runtime pack
 

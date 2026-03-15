@@ -39,7 +39,7 @@ function Find-BytePatternPositions {
     return $positions
 }
 
-$resolvedClientDllPath = (Resolve-Path $ClientDllPath).Path
+$resolvedClientDllPath = Resolve-Path -LiteralPath $ClientDllPath | Select-Object -First 1 -ExpandProperty Path
 
 if ($TargetLocalIp.Length -gt $ExpectedRuntimeIp.Length) {
     throw "O IP alvo '$TargetLocalIp' e maior que o placeholder '$ExpectedRuntimeIp'."

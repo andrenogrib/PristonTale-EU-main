@@ -8,8 +8,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$backupDir = (Resolve-Path (Join-Path $repoRoot 'Files\DBS\extracted')).Path
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$backupDir = Resolve-Path -LiteralPath (Join-Path $repoRoot 'Files\DBS\extracted') | Select-Object -First 1 -ExpandProperty Path
 $dockerDesktopPath = 'C:\Program Files\Docker\Docker\Docker Desktop.exe'
 
 function Test-DockerReady {

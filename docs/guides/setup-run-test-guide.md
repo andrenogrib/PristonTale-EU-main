@@ -10,8 +10,8 @@ Este guia assume:
 
 Docs relacionadas:
 
-- `docs/server-commands-reference.md`
-- `docs/item-code-and-data-reference.md`
+- `docs/reference/server-commands-reference.md`
+- `docs/reference/item-code-and-data-reference.md`
 
 ## Objetivo
 
@@ -38,6 +38,7 @@ Obrigatorio para subir server:
 Muito recomendado:
 
 - driver ODBC `SQL Server Native Client 11.0`
+- ou `ODBC Driver 17 for SQL Server`
 
 Alternativa se nao quiser instalar o Native Client 11:
 
@@ -449,22 +450,68 @@ Sintoma:
 - o login funciona
 - mas criar personagem gera erros como `Invalid precision value` ou `COUNT field incorrect or syntax error`
 - o `Log.txt` mostra falha em `INSERT INTO CharacterInfo`
+- o `Log.txt` do login server tambem pode mostrar falha em `INSERT INTO CharacterLog`
 
 Correcao recomendada:
 
 - instalar um driver SQL mais compativel, como `SQL Server Native Client 11.0`
+- ou `ODBC Driver 17 for SQL Server`
+- depois ajustar os dois `server.ini` para o nome exato do driver instalado
 
 Workaround pratico para teste local:
 
 ```powershell
-.\scripts\assign-pt-character-to-account.ps1
+.\scripts\fix-pt-local-runtime.ps1
 ```
 
 Esse script:
 
-- pega o personagem `Administrador` ja existente no banco e no runtime pack
-- vincula esse personagem a conta `admin`
+- reduz o gold do `Administrador` para evitar o cheat `99007`
+- limpa timers invalidos criados por tentativas quebradas de criar personagem
+- vincula personagens de teste conhecidos a `admin`
 - permite testar entrada no jogo sem depender da tela de criacao de personagem
+
+Personagens que o workaround tenta deixar disponiveis em `admin`:
+
+- `Administrador`
+- `aglob`
+- `test_fs_100`
+- `test_ms_100`
+- `test_ps_100`
+- `test_prs_100`
+
+Detalhe tecnico da causa:
+
+- o `server.dll` usa bind ODBC parametrizado que funciona melhor com Native Client 11 ou ODBC 17
+- com `Driver={SQL Server}`, alguns `tinyint` enviados como `PARAMTYPE_Byte` falham no `SQLBindParameter`
+- na pratica isso quebra a gravacao de `CharacterInfo` e `CharacterLog`
+
+Regra pratica:
+
+- com o runtime atual, use personagens ja existentes para validar login, selecao e entrada no mundo
+- deixe a criacao de personagem novo para depois que o driver ODBC compativel estiver instalado
+
+### Cheat `99007` no personagem `Administrador`
+
+Sintoma:
+
+- ao entrar ou sair do personagem `Administrador`, o log acusa `WARN: Cheat detected: 99007`
+
+Diagnostico:
+
+- `99007` e `CHEATLOGID_GoldLimitReached`
+- esse alerta dispara quando o personagem passa do limite de gold permitido pelo server
+- o `Administrador` do pacote veio com gold acima do limite
+
+Correcao:
+
+- rode `.\scripts\fix-pt-local-runtime.ps1`
+- o script reduz o gold do `Administrador` para um valor seguro
+
+Impacto:
+
+- isso remove o falso positivo de cheat no personagem de teste
+- nao corrige criacao de personagem; esse e um problema separado de driver ODBC
 
 ### Erro `LevelUpDate` invalido
 
@@ -508,8 +555,10 @@ Se voce quiser apenas subir e testar local:
 4. Se nao existir, crie `admin` / `admin`.
 5. Ajuste `Driver`, `Host`, `User` e `Password` nos dois `server.ini`.
 6. Rode `.\scripts\patch-pt-client-localhost.ps1`.
-7. Rode `.\scripts\start-pt-server.ps1`.
-8. Abra o client.
-9. Tente logar com `admin` / `admin`.
+7. Rode `.\scripts\fix-pt-local-runtime.ps1`.
+8. Rode `.\scripts\start-pt-server.ps1`.
+9. Abra o client.
+10. Tente logar com `admin` / `admin`.
+11. Se a tela de criacao falhar, use um dos personagens ja vinculados a `admin`.
 
 Se os logs mostrarem erro de schema, o proximo passo nao e recompilar o source; o proximo passo e acertar os bancos primeiro.

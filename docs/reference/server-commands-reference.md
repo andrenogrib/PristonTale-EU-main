@@ -494,4 +494,4 @@ rg -n 'OnGameMasterAdminCommand|OnGameMasterLevel1Command|OnGameMasterLevel2Comm
 - Alguns comandos existem em alias de caixa alta/baixa.
 - Alguns comandos mexem em monstro spawnado no mapa, nao no cadastro base por nome.
 - Alguns comandos foram feitos para dev/teste e podem ser perigosos em servidor aberto.
-- Para item e drop, a outra doc util e `docs/item-code-and-data-reference.md`.
+- Para item e drop, a outra doc util e `docs/reference/item-code-and-data-reference.md`.

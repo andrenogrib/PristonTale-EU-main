@@ -16,7 +16,7 @@ Hoje ele tambem ja tem documentacao local para:
 - `game/`: source do client
 - `Server/`: source do login server e game server
 - `shared/`: estruturas e tipos compartilhados
-- `docs/`: guias de setup, analise do runtime e referencias de comandos/dados
+- `docs/`: documentacao setorizada em guides, analysis, reference, studies e troubleshooting
 - `scripts/`: utilitarios de SQL, start/stop e lookup rapido
 - `Files/`: runtime pack local com client, server e bancos restauraveis
 
@@ -32,7 +32,7 @@ A pasta `Files/` funciona como runtime pack local.
 
 Se voce quer subir o ambiente local, siga esta ordem:
 
-1. leia [docs/setup-run-test-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/setup-run-test-guide.md)
+1. leia [docs/guides/server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md)
 2. suba o SQL local com `.\scripts\start-pt-docker-sql.ps1`
 3. restaure/alinhe os bancos com `.\scripts\restore-pt-docker-dbs.ps1`
 4. suba os servidores com `.\scripts\start-pt-server.ps1`
@@ -43,13 +43,21 @@ Conta local de teste documentada no setup:
 - login: `admin`
 - senha: `admin`
 
+Se o runtime pack vier com problema de cheat no `Administrador` ou falha na criacao de personagem, rode antes:
+
+- `.\scripts\fix-pt-local-runtime.ps1`
+
 ## Documentacao principal
 
 - [docs/README.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/README.md): indice da documentacao
-- [docs/project-analysis.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/project-analysis.md): analise tecnica do pacote `Files/`
-- [docs/setup-run-test-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/setup-run-test-guide.md): guia pratico de setup, start e teste
-- [docs/server-commands-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/server-commands-reference.md): referencia de comandos de player, GM1, GM2, GM3 e GM4/Admin
-- [docs/item-code-and-data-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/item-code-and-data-reference.md): onde achar `itemCode`, `ItemID`, drop e spawn
+- [docs/guides/server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md): guia direto para ligar, monitorar e parar o server com os scripts
+- [docs/guides/setup-run-test-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/setup-run-test-guide.md): guia pratico de setup, start e teste
+- [docs/analysis/project-analysis.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/analysis/project-analysis.md): analise tecnica do pacote `Files/`
+- [docs/reference/server-commands-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/reference/server-commands-reference.md): referencia de comandos de player, GM1, GM2, GM3 e GM4/Admin
+- [docs/reference/item-code-and-data-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/reference/item-code-and-data-reference.md): onde achar `itemCode`, `ItemID`, drop e spawn
+- [docs/studies/README.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/studies/README.md): setor recomendado para estudos e investigacoes profundas
+- [docs/troubleshooting/README.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/troubleshooting/README.md): setor recomendado para incidentes e correcoes operacionais
+- [docs/troubleshooting/local-runtime-known-issues.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/troubleshooting/local-runtime-known-issues.md): problemas reais do runtime local e como contornar
 
 ## Scripts uteis
 
@@ -60,6 +68,7 @@ Conta local de teste documentada no setup:
 - [scripts/find-pt-item.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/find-pt-item.ps1): busca item por nome, `itemCode` ou `ItemID`
 - [scripts/patch-pt-client-localhost.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/patch-pt-client-localhost.ps1): alinha client binario para localhost
 - [scripts/assign-pt-character-to-account.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/assign-pt-character-to-account.ps1): vincula personagem existente a uma conta
+- [scripts/fix-pt-local-runtime.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/fix-pt-local-runtime.ps1): aplica o workaround local para cheat `99007`, timers invalidos e personagens de teste
 
 ## Exemplos rapidos
 
@@ -79,8 +88,8 @@ Ativar GM no jogo:
 
 Comandos de GM e lookup de item ficam documentados em:
 
-- [docs/server-commands-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/server-commands-reference.md)
-- [docs/item-code-and-data-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/item-code-and-data-reference.md)
+- [docs/reference/server-commands-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/reference/server-commands-reference.md)
+- [docs/reference/item-code-and-data-reference.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/reference/item-code-and-data-reference.md)
 
 ## Solucao e build
 
