@@ -137,7 +137,9 @@ Conclusao pratica:
 
 O login depende de:
 
-- senha comparada em texto puro
+- senha comparada com o valor gravado no banco, sem re-hash no server
+- o client faz `SHA-256` antes de enviar a senha
+- formula observada no client: `SHA256(UPPER(AccountName) + ":" + PlainPassword)`
 - `Flag` com:
   - `Activated = 2`
   - `AcceptedLatestTOA = 32`
@@ -146,7 +148,13 @@ O login depende de:
 
 Valor pratico para um usuario de teste:
 
-- `Flag = 98`
+- `Flag = 114` nos usuarios de teste restaurados
+
+Conclusao pratica:
+
+- as senhas vistas em `UserInfo` na base restaurada estao em hash SHA-256
+- por isso nao existe como ler a senha real de contas antigas so olhando a tabela
+- para um usuario novo de teste, o hash precisa ser gravado no mesmo formato do client
 
 ## Erros reais encontrados nos logs
 

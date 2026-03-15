@@ -47,6 +47,14 @@ Para o client, pode ser necessario:
 
 - DirectX 9 runtime, caso faltem DLLs como `d3dx9` ou `dsound`
 
+Alternativa pratica sem instalar `SQLEXPRESS` no Windows:
+
+- Docker Desktop
+- `.\scripts\start-pt-docker-sql.ps1`
+- `.\scripts\restore-pt-docker-dbs.ps1`
+
+Esse caminho sobe um SQL Server 2022 em container, restaura os bancos do pacote, cria `ChatDB` e `SkillDB` como placeholders e provisiona `admin` / `admin`.
+
 Comandos uteis via `winget`:
 
 ```powershell
@@ -112,13 +120,20 @@ Contas vistas em logs antigos:
 Senha conhecida:
 
 - nenhuma senha foi descoberta nos arquivos inspecionados
+- as senhas da `UserInfo` restaurada estao em hash SHA-256
 
 Se nao houver uma conta funcional, a conta padrao recomendada para teste e:
 
 - login: `admin`
 - senha: `admin`
 
-Script base para criar `admin` / `admin`:
+Regra importante do login:
+
+- o client envia `SHA-256(UPPER(login) + ":" + senhaEmTexto)`
+- para `admin` / `admin`, o hash correto e:
+  - `E0E72A977BC2C38BA687BAF40D17BFD68BA7830CB15DB4DA2C4897D5B20BC21D`
+
+Script base para criar ou atualizar `admin` / `admin`:
 
 ```sql
 IF NOT EXISTS (
@@ -131,12 +146,16 @@ BEGIN
         (
             AccountName,
             [Password],
+            RegisDay,
             Flag,
             Active,
+            ActiveCode,
             Coins,
+            Email,
             GameMasterType,
             GameMasterLevel,
             GameMasterMacAddress,
+            CoinsTraded,
             BanStatus,
             UnbanDate,
             IsMuted,
@@ -146,13 +165,17 @@ BEGIN
     VALUES
         (
             'admin',
-            'admin',
-            98,
+            'E0E72A977BC2C38BA687BAF40D17BFD68BA7830CB15DB4DA2C4897D5B20BC21D',
+            'Mar 15 2026  7:45PM',
+            114,
             1,
+            '0',
+            1500,
+            'admin@invalid.email.com',
+            1,
+            4,
+            '0',
             0,
-            0,
-            0,
-            '',
             0,
             NULL,
             0,
@@ -164,9 +187,9 @@ END;
 
 Notas importantes:
 
-- `Flag = 98` representa `Activated + AcceptedLatestTOA + Approved`.
+- `Flag = 114` e o mesmo padrao encontrado nos usuarios de teste restaurados.
 - Se sua tabela `UserInfo` tiver outras colunas obrigatorias sem valor default, complete o `INSERT` antes de executar.
-- A senha e comparada em texto puro pelo server.
+- O server compara o hash recebido do client com o valor salvo no banco.
 
 ## 4. Alinhar configuracao dos servers
 
@@ -217,6 +240,9 @@ Scripts incluidos neste repo:
 
 - `scripts/start-pt-server.ps1`
 - `scripts/stop-pt-server.ps1`
+- `scripts/start-pt-docker-sql.ps1`
+- `scripts/stop-pt-docker-sql.ps1`
+- `scripts/restore-pt-docker-dbs.ps1`
 
 Fluxo recomendado:
 
@@ -251,6 +277,32 @@ Para parar tudo:
 ```
 
 Antes de rodar, confirme que o servico `MSSQL$SQLEXPRESS` esta instalado e iniciado.
+
+## 6.1 Atalho com Docker
+
+Se voce nao quiser instalar `SQLEXPRESS` no Windows:
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\restore-pt-docker-dbs.ps1
+.\scripts\start-pt-server.ps1
+```
+
+Com esse fluxo, os `server.ini` precisam apontar para:
+
+```ini
+[Database]
+Driver={SQL Server}
+Host=127.0.0.1,1433
+User=sa
+Password=632514Go
+```
+
+Para desligar o SQL do Docker:
+
+```powershell
+.\scripts\stop-pt-docker-sql.ps1
+```
 
 ## 7. Ordem correta de start
 
