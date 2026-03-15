@@ -11,6 +11,12 @@ Escopo desta analise:
 - clan web em `Files/ClanSystem`
 - IIS/PHP empacotados em `Files/Inetpub`
 
+Docs relacionadas:
+
+- `docs/setup-run-test-guide.md`
+- `docs/server-commands-reference.md`
+- `docs/item-code-and-data-reference.md`
+
 ## Visao geral
 
 - O projeto tem source C++ do client e do server.
@@ -19,6 +25,7 @@ Escopo desta analise:
   - `Files/Server/login-server/Server.exe`
   - `Files/Server/game-server/Server.exe`
   - `Files/Game/Game.exe`
+- O runtime pack nao esta 100% sincronizado com a source atual.
 
 ## Estrutura do runtime pack
 
@@ -31,7 +38,7 @@ Escopo desta analise:
 
 ## Configuracao de rede
 
-- O client esta preparado para `127.0.0.1`.
+- A source do client esta preparada para `127.0.0.1`.
 - O mundo principal encontrado no source e `Babel`.
 - Porta do login server: `10009`.
 - Porta do game server: `10007`.
@@ -39,7 +46,33 @@ Escopo desta analise:
 
 Conclusao pratica:
 
-- O pacote esta montado para teste local na mesma maquina, desde que o SQL Server e os bancos estejam corretos.
+- A source esta montada para teste local na mesma maquina, desde que o SQL Server e os bancos estejam corretos.
+- O runtime real do client precisa ser validado antes do teste, porque `Files/Game/game.dll` pode nao bater com a source.
+
+## Divergencia critica entre source e runtime
+
+Durante o teste local foi encontrado um motivo concreto para o erro `connection failed` no client:
+
+- a source em `game/game/globals.h` e `game/game/CGameWorld.cpp` aponta para `127.0.0.1`
+- porem o runtime distribuido em `Files/Game/game.dll` ainda carregava o IP publico `15.204.184.155`
+- o `Game.exe` carrega esse `game.dll`, entao abrir o client nao significa necessariamente usar a configuracao que esta na source
+
+Impacto pratico:
+
+- o login `admin` / `admin` nem chegava ao `login-server`
+- os logs do `login-server` nao mostravam tentativa de autenticacao
+- o erro acontecia antes da validacao de conta e senha
+
+Correcao adotada:
+
+- criar o script `scripts/patch-pt-client-localhost.ps1`
+- esse script faz backup de `Files/Game/game.dll`
+- depois substitui o IP antigo `15.204.184.155` por `127.0.0.1` dentro do binario distribuido
+
+Conclusao pratica:
+
+- para teste local com o runtime pack atual, nao basta alinhar a source
+- e preciso alinhar tambem o binario real que o `Game.exe` carrega
 
 ## Configuracao de banco
 
@@ -155,6 +188,7 @@ Conclusao pratica:
 - as senhas vistas em `UserInfo` na base restaurada estao em hash SHA-256
 - por isso nao existe como ler a senha real de contas antigas so olhando a tabela
 - para um usuario novo de teste, o hash precisa ser gravado no mesmo formato do client
+- a conta de teste preparada para setup local continua sendo `admin` / `admin`
 
 ## Erros reais encontrados nos logs
 
@@ -183,6 +217,9 @@ Impacto:
 
 - se o `SQL Server Native Client 11.0` nao estiver instalado, pode ser necessario trocar os dois `server.ini` para `Driver={SQL Server}`
 - IIS e PHP so sao obrigatorios se quiser subir o clan/painel web
+- com o driver generico `SQL Server`, o login funcionou, mas alguns `INSERT` parametrizados falharam com `HY104` e `07002`
+- o caso mais importante foi a criacao de personagem em `CharacterInfo`
+- para contornar isso no teste local, foi criado o script `scripts/assign-pt-character-to-account.ps1`
 
 ## Versionamento do runtime pack
 
