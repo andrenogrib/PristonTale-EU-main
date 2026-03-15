@@ -65,6 +65,32 @@ Correcao definitiva:
 
 - instalar um driver ODBC compativel com esse binario, como `SQL Server Native Client 11.0` ou `ODBC Driver 17 for SQL Server`
 
+Status atual do ambiente:
+
+- o `ODBC Driver 17 for SQL Server` ja esta configurado nos `server.ini`
+- isso removeu os erros antigos de bind ODBC como `HY104` e `07002`
+- os erros restantes observados agora sao de schema e rotinas ausentes, nao do driver em si
+
+## Login falha para conta customizada depois de restore
+
+Sintoma:
+
+- a conta customizada existia antes
+- depois de rodar `.\scripts\restore-pt-docker-dbs.ps1`, o login passa a falhar
+- o log pode mostrar `SELECT TOP(1) FROM UserInfo query failed for account '<login>'`
+
+Causa raiz:
+
+- o restore sobrescreve o `UserDB` com o backup base
+- isso remove contas criadas manualmente depois
+- a mesma restauracao tambem pode devolver personagens de teste para a conta antiga
+
+Correcao:
+
+```powershell
+.\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
+```
+
 ## Personagens seguros para teste na conta `admin`
 
 Hoje os personagens recomendados para teste local sao:

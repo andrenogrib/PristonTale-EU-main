@@ -135,6 +135,21 @@ Se nao houver uma conta funcional, a conta padrao recomendada para teste e:
 - login: `admin`
 - senha: `admin`
 
+Conta adicional preparada manualmente no ambiente local desta analise:
+
+- login: `dedezin`
+- senha: `dedezin123`
+- `GameMasterType = 1`
+- `GameMasterLevel = 4`
+- personagem de teste vinculado: `test_ps_100`
+- classe: pike
+
+Observacao importante:
+
+- se voce rodar `.\scripts\restore-pt-docker-dbs.ps1` depois disso, o `UserDB` sera restaurado do backup
+- isso pode remover a conta `dedezin` e devolver `test_ps_100` para outra conta
+- para recriar a conta customizada, use `.\scripts\provision-pt-test-account.ps1`
+
 Regra importante do login:
 
 - o client envia `SHA-256(UPPER(login) + ":" + senhaEmTexto)`

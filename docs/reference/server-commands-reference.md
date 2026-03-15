@@ -9,6 +9,18 @@ O foco aqui e facilitar tres coisas:
 - descobrir rapidamente onde mexer em item, drop, EXP, monstro e manutencao
 - achar o ponto de source certo quando voce precisar aprofundar
 
+Se voce quer o jeito mais facil de usar esses comandos dentro do jogo, leia antes:
+
+- `docs/guides/gm-handbook.md`
+- `docs/guides/events-and-rates-guide.md`
+- `docs/guides/account-and-character-management.md`
+
+Se voce precisa descobrir `mapId`, `itemCode` ou `MonsterID` para usar junto dos comandos, use:
+
+- `docs/reference/map-id-reference.md`
+- `docs/reference/item-id-reference.md`
+- `docs/reference/monster-id-reference.md`
+
 ## Fonte de verdade
 
 - Chat commands: `Server/server/servercommand.cpp`

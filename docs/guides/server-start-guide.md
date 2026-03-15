@@ -25,6 +25,21 @@ Conta padrao de teste:
 - login: `admin`
 - senha: `admin`
 
+Conta adicional de teste preparada neste ambiente:
+
+- login: `dedezin`
+- senha: `dedezin123`
+- privilegio de conta: `GameMasterType=1` e `GameMasterLevel=4`
+- personagem vinculado: `test_ps_100`
+- classe do personagem: pike
+- level do personagem: 100
+
+Importante:
+
+- se voce rodar `.\scripts\restore-pt-docker-dbs.ps1` de novo, o `UserDB` sera restaurado do backup
+- isso pode apagar contas customizadas e reverter a posse de personagens
+- depois do restore, rode `.\scripts\provision-pt-test-account.ps1` para recriar `dedezin`
+
 ## Caminho mais curto
 
 Na raiz do repo, rode nesta ordem:
@@ -144,6 +159,7 @@ Funcao:
 - cria `ChatDB` e `SkillDB` como placeholder, se faltarem
 - cria ou atualiza a conta `admin/admin`
 - configura essa conta como GM/Admin para teste local
+- sobrescreve o `UserDB` restaurado com o estado do backup
 
 Use quando:
 
@@ -211,6 +227,30 @@ Personagens que ele tenta deixar usaveis em `admin`:
 - `test_ms_100`
 - `test_ps_100`
 - `test_prs_100`
+
+### `provision-pt-test-account.ps1`
+
+Arquivo: `scripts/provision-pt-test-account.ps1`
+
+Funcao:
+
+- cria ou atualiza uma conta customizada no `UserDB`
+- grava a senha no mesmo formato de hash usado pelo client
+- configura `GameMasterType` e `GameMasterLevel`
+- vincula um personagem existente a essa conta
+- ajusta o `GMLevel` do personagem
+
+Use quando:
+
+- voce restaurou os bancos e perdeu contas customizadas
+- quer recriar rapidamente uma conta de teste
+- quer transferir um personagem de teste existente para outra conta
+
+Exemplo usado neste ambiente:
+
+```powershell
+.\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
+```
 
 ### `start-pt-server.ps1`
 
@@ -350,6 +390,19 @@ Sinais bons:
 - o client abre sem `connection failed`
 - o login `admin/admin` funciona
 - a conta `admin` mostra personagens na tela de selecao
+
+Voce tambem pode testar com a conta extra:
+
+- login: `dedezin`
+- senha: `dedezin123`
+- personagem: `test_ps_100`
+- para ativar GM no jogo: `/activategm`
+
+Se voce acabou de rodar o restore e a conta sumiu:
+
+```powershell
+.\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
+```
 
 ## Se der erro
 

@@ -26,16 +26,28 @@ Essa divisao funciona bem aqui porque o projeto mistura:
 
 - `docs/guides/server-start-guide.md`: guia operacional focado so em ligar, parar e testar o server local usando os scripts do repo
 - `docs/guides/setup-run-test-guide.md`: guia pratico mais completo para restaurar banco, alinhar configuracoes, subir os servidores, abrir o client e testar login
+- `docs/guides/gm-handbook.md`: handbook pratico para GM/Admin usar comandos dentro do jogo sem depender de source
+- `docs/guides/account-and-character-management.md`: como criar conta, dar GM/Admin, mover personagem e editar dados via banco
+- `docs/guides/client-localhost-patch-guide.md`: explica por que o `game.dll` precisou de patch para localhost e como repetir o ajuste
+- `docs/guides/scripts-handbook.md`: explicacao detalhada de cada script criado no repo, com exemplos prontos
+- `docs/guides/events-and-rates-guide.md`: guia direto de EXP, drop, eventos sazonais, buffs globais e manutencao
 - `docs/analysis/project-analysis.md`: resumo tecnico do que existe no pacote `Files`, como o client/server estao configurados e quais dependencias faltam para subir o ambiente
 - `docs/reference/server-commands-reference.md`: referencia dos comandos de player, GM1, GM2, GM3 e GM4/Admin definidos em `Server/server/servercommand.cpp`
 - `docs/reference/item-code-and-data-reference.md`: guia de onde achar `itemCode`, `ItemID`, nome de item, tabelas de drop, spawn e monster stats
+- `docs/reference/map-id-reference.md`: tabela gerada automaticamente com `mapId`, nome, short name e arquivo de mapa
+- `docs/reference/item-id-reference.md`: tabela gerada automaticamente com `itemCode`, `IDCode`, nome e classificacao do item
+- `docs/reference/monster-id-reference.md`: tabela gerada automaticamente com `MonsterID`, nome, level e EXP do monstro
 - `docs/studies/README.md`: definicao do setor de estudos e investigacoes futuras
 - `docs/troubleshooting/README.md`: definicao do setor de incidentes e correcoes operacionais
 - `docs/troubleshooting/local-runtime-known-issues.md`: erros reais ja vistos no setup local, com causa raiz e workaround
 - `scripts/patch-pt-client-localhost.ps1`: patch utilitario para alinhar o `Files/Game/game.dll` com localhost quando o runtime pack vier compilado para IP publico.
 - `scripts/assign-pt-character-to-account.ps1`: utilitario para vincular um personagem ja existente do banco a uma conta de teste quando a criacao de personagem estiver falhando por driver/schema.
 - `scripts/fix-pt-local-runtime.ps1`: workaround rapido para o ambiente local. Ajusta o gold do `Administrador`, limpa timers invalidos e vincula personagens de teste conhecidos a `admin`.
+- `scripts/provision-pt-test-account.ps1`: cria ou atualiza uma conta customizada de teste, aplica GM e vincula um personagem existente.
 - `scripts/find-pt-item.ps1`: busca em `GameDB.dbo.ItemList` ou `ItemListOld` por nome, `itemCode` ou `ItemID`.
+- `scripts/find-pt-map.ps1`: busca em `GameDB.dbo.MapList` por nome, short name ou `mapId`.
+- `scripts/find-pt-monster.ps1`: busca em `GameDB.dbo.MonsterList` por nome, `MonsterID` ou model file.
+- `scripts/export-pt-reference-docs.ps1`: regenera as referencias markdown de mapa, item e monstro a partir do banco.
 
 ## Convencao de revisao
 
@@ -58,6 +70,11 @@ Quando a duvida for "onde eu acho isso?", use este atalho:
 
 - comando de GM ou player: `docs/reference/server-commands-reference.md`
 - item code, ItemID, drop ou monstro: `docs/reference/item-code-and-data-reference.md`
+- manual pratico de GM dentro do jogo: `docs/guides/gm-handbook.md`
+- criar conta, mover char ou dar Admin: `docs/guides/account-and-character-management.md`
+- entender os scripts do repo: `docs/guides/scripts-handbook.md`
+- eventos, EXP, drop e manutencao: `docs/guides/events-and-rates-guide.md`
+- patch do client para localhost: `docs/guides/client-localhost-patch-guide.md`
 - setup local e ordem de boot: `docs/guides/setup-run-test-guide.md`
 - ligar e parar o server pelo fluxo com scripts: `docs/guides/server-start-guide.md`
 - analise do runtime pack e riscos conhecidos: `docs/analysis/project-analysis.md`
