@@ -4457,6 +4457,13 @@ void ItemServer::GetItemSpecMod()
 					pcDB->GetData(15, PARAMTYPE_Integer, &CurrentItemSpecMod->eStatModifier.iAgility);
 					pcDB->GetData(16, PARAMTYPE_Integer, &CurrentItemSpecMod->eStatModifier.iHealth);
 
+					// Item requirements should come from ItemList only, not ItemSpecMod percentage overrides.
+					CurrentItemSpecMod->eStatModifier.iStrength = 0;
+					CurrentItemSpecMod->eStatModifier.iSpirit = 0;
+					CurrentItemSpecMod->eStatModifier.iTalent = 0;
+					CurrentItemSpecMod->eStatModifier.iAgility = 0;
+					CurrentItemSpecMod->eStatModifier.iHealth = 0;
+
 					ItemSpecModList.push_back(CurrentItemSpecMod);
 				}
 			}

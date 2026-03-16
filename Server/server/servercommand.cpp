@@ -889,17 +889,25 @@ BOOL ServerCommand::OnGameMasterAdminCommand( User * pcUser, const char * pszBuf
 	}
 	else if ( iLen = COMMAND( "/force_night_mode", pszBuff ) ) //dev experiemental only
 	{
+		BOOL bEnable = TRUE;
+
 		if ( GetParameterString( pszBuff, 1, szCommandParam1 ) )
-		{
-			MAPSERVER->ForceNightMode( atoi( szCommandParam1 ) >= 1 );
-		}
+			bEnable = atoi( szCommandParam1 ) >= 1;
+
+		MAPSERVER->ForceNightMode( bEnable );
+		MAPSERVER->UpdateTime();
+		CHATSERVER->SendChatEx( pcUser, CHATCOLOR_White, "> Force night mode %s", bEnable ? "enabled" : "disabled" );
 	}
 	else if ( iLen = COMMAND( "/force_day_mode", pszBuff ) ) //dev  experiemental only
 	{
+		BOOL bEnable = TRUE;
+
 		if ( GetParameterString( pszBuff, 1, szCommandParam1 ) )
-		{
-			MAPSERVER->ForceDayMode( atoi( szCommandParam1 ) >= 1 );
-		}
+			bEnable = atoi( szCommandParam1 ) >= 1;
+
+		MAPSERVER->ForceDayMode( bEnable );
+		MAPSERVER->UpdateTime();
+		CHATSERVER->SendChatEx( pcUser, CHATCOLOR_White, "> Force day mode %s", bEnable ? "enabled" : "disabled" );
 	}
 	else if ( iLen = COMMAND( "/testmap_hp", pszBuff ) )
 	{

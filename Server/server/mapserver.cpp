@@ -28,6 +28,81 @@ BOOL * pbIsCrystalMonster		= (BOOL*)(0x08B81830);
 BOOL * pbIsSummonedGMMonster	= (BOOL*)(0x08B81834);
 BOOL * pbIsSummonedMonster		= (BOOL*)(0x08B81838);
 
+namespace
+{
+	BOOL IsQuestWolverineMarker( PacketUnitInfo * psNPC )
+	{
+		if ( psNPC == NULL || psNPC->iHeader == 0 )
+			return FALSE;
+
+		return STRINGCOMPAREI( psNPC->sCharacterData.szName, "Bronze Wolverine" ) ||
+			   STRINGCOMPAREI( psNPC->sCharacterData.szName, "Silver Wolverine" ) ||
+			   STRINGCOMPAREI( psNPC->sCharacterData.szName, "Golden Wolverine" );
+	}
+
+	BOOL HasActiveQuestWolverines( Map * pcMap )
+	{
+		for ( int i = 0; i < MAX_UNITS; i++ )
+		{
+			UnitData * pcUnitData = UNITSDATA + i;
+
+			if ( pcUnitData &&
+				 pcUnitData->bActive &&
+				 pcUnitData->pcMap == pcMap &&
+				 pcUnitData->pcOwner == NULL &&
+				 pcUnitData->sUnitInfo.eSpecialType == SPECIALUNITTYPE_QuestWolverine )
+			{
+				return TRUE;
+			}
+		}
+
+		return FALSE;
+	}
+
+	BOOL SpawnQuestWolverinesFromMarkers( Map * pcMap )
+	{
+		BOOL bSpawned = FALSE;
+
+		for ( UINT i = 0; i < MAX_NPCINMAP; i++ )
+		{
+			PacketUnitInfo * psNPC = pcMap->saNPC + i;
+
+			if ( IsQuestWolverineMarker( psNPC ) == FALSE )
+				continue;
+
+			CharacterData * psCharacterData = UNITINFODATA->FindEnemyCharInfo( psNPC->sCharacterData.szName );
+			if ( psCharacterData == NULL )
+			{
+				WARN( "Quest Wolverine marker '%s' does not have a matching monster definition", psNPC->sCharacterData.szName );
+				continue;
+			}
+
+			if ( MAPSERVER->SpawnMonsterBC( pcMap, psCharacterData, psNPC->sPosition.iX, psNPC->sPosition.iY, psNPC->sPosition.iZ ) )
+				bSpawned = TRUE;
+		}
+
+		return bSpawned;
+	}
+
+	BOOL EnsureQuestWolverinesSpawned( Map * pcMap )
+	{
+		if ( HasActiveQuestWolverines( pcMap ) )
+			return TRUE;
+
+		CALL_WITH_ARG4( 0x0055BB00, SPECIALUNITTYPE_QuestWolverine, 0, 0, 0 ); // rsOpenEventMonster
+
+		if ( HasActiveQuestWolverines( pcMap ) )
+			return TRUE;
+
+		if ( SpawnQuestWolverinesFromMarkers( pcMap ) )
+		{
+			INFO( "Quest Wolverine fallback spawn activated for Ricarten" );
+			return HasActiveQuestWolverines( pcMap );
+		}
+
+		return FALSE;
+	}
+}
 
 
 #define ITEM_TRANS_LIMIT_TIME	16000
@@ -2823,7 +2898,7 @@ void MapServer::UpdateMap( Map * pcMap )
 				if ( IsNight() )
 				{
 					//Switching to Night.. spawn Wolverines
-					CALL_WITH_ARG4( 0x0055BB00, SPECIALUNITTYPE_QuestWolverine, 0, 0, 0 ); //rsOpenEventMonster
+					EnsureQuestWolverinesSpawned( pcMap );
 				}
 				else
 				{
@@ -2843,6 +2918,22 @@ void MapServer::UpdateMap( Map * pcMap )
 
 			//Swift DayNight Time in Map
 			pcMap->bNight = IsNight();
+		}
+
+		if ( pcMap->pcBaseMap->iMapID == MAPID_RicartenTown )
+		{
+			// Keep the level 20 rank-up Wolverines in sync even when the server starts during the current night state.
+			if ( IsNight() )
+			{
+				if ( HasActiveQuestWolverines( pcMap ) == FALSE )
+				{
+					EnsureQuestWolverinesSpawned( pcMap );
+				}
+			}
+			else if ( HasActiveQuestWolverines( pcMap ) )
+			{
+				CloseEventMonster( SPECIALUNITTYPE_QuestWolverine );
+			}
 		}
 	}
 }

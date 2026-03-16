@@ -249,6 +249,13 @@ Important note:
 - this fix changes the server source code
 - if you are running the prebuilt runtime from `Files/Server`, you must rebuild and redeploy the server binary for the fix to affect your live local server
 
+Current follow-up status:
+
+- the runtime now includes a fallback spawn path that uses the Ricarten Wolverine markers if the legacy night event call does not populate the monsters
+- `/force_night_mode` was also updated to apply immediately without requiring an explicit `1` parameter
+- there is still an open local issue where forcing night can darken the world and then close the game server process
+- that crash still needs investigation in the current runtime and should be the next follow-up task
+
 ## Safe local test characters on `admin`
 
 The currently recommended local test characters are:
