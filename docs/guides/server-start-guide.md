@@ -123,7 +123,7 @@ This starts SQL Server in Docker on `127.0.0.1,1433`.
 
 This restores the `.bak` files, creates `ChatDB` and `SkillDB` if they are missing, and guarantees `admin/admin`.
 
-It also repairs the log-cleanup maintenance procedures in `LogDB` and `ChatDB`.
+It also repairs the log-cleanup maintenance procedures in `LogDB` and `ChatDB`, and patches the quest schema expected by the current runtime in `GameDB`.
 
 ### 3. Patch the client to localhost
 
@@ -229,9 +229,27 @@ What it does:
 - restores `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew`, and `UserDB`
 - creates `ChatDB` and `SkillDB` as placeholders if they are missing
 - repairs the background log-cleanup procedures in `LogDB` and `ChatDB`
+- repairs the quest schema expected by the current runtime in `GameDB`
 - creates or updates `admin/admin`
 - sets that account as GM/Admin for local testing
 - overwrites `UserDB` with the restored baseline
+
+### `repair-pt-quest-schema.ps1`
+
+File: `scripts/repair-pt-quest-schema.ps1`
+
+What it does:
+
+- patches `GameDB.dbo.QuestList`
+- patches `GameDB.dbo.QuestRewardList`
+- adds missing quest columns such as `MainQuestID`, `QuestBookName`, and `ASMQuestBit`
+- backfills safe default values so the startup quest loader can complete
+
+Use it when:
+
+- the login or game server log shows `Invalid column name 'MainQuestID'`
+- startup logs contain many `Quest not found for ... in QuestWindowList ...` warnings
+- you restored the databases manually and want the same quest fix as the scripted restore
 
 ### `repair-pt-log-cleanup.ps1`
 

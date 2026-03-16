@@ -2817,13 +2817,13 @@ void MapServer::UpdateMap( Map * pcMap )
 			{
 				//DEBUGSTATUS( "Day / night mode changed for map id: %d. Is night time: %d", pcMap->pcBaseMap->iMapID, IsNight() );
 
-				CloseEventMonster( 100 );
+				CloseEventMonster( SPECIALUNITTYPE_QuestWolverine );
 				//CALL_WITH_ARG1( 0x00552060, 100 ); //Removes Wolverines from World (rsCloseEventMonster) - buggy, also removes pet wolverine??
 
 				if ( IsNight() )
 				{
 					//Switching to Night.. spawn Wolverines
-					//CALL_WITH_ARG4( 0x0055BB00, 100, 0, 0, 0 ); //rsOpenEventMonster
+					CALL_WITH_ARG4( 0x0055BB00, SPECIALUNITTYPE_QuestWolverine, 0, 0, 0 ); //rsOpenEventMonster
 				}
 				else
 				{

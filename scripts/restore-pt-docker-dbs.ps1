@@ -112,6 +112,13 @@ if (-not (Test-Path -LiteralPath $repairLogCleanupScript)) {
 
 & $repairLogCleanupScript -SqlServer $SqlServer -SqlUser $SqlUser -SqlPassword $SqlPassword
 
+$repairQuestSchemaScript = Join-Path $PSScriptRoot 'repair-pt-quest-schema.ps1'
+if (-not (Test-Path -LiteralPath $repairQuestSchemaScript)) {
+    throw "Could not find '$repairQuestSchemaScript'."
+}
+
+& $repairQuestSchemaScript -SqlServer $SqlServer -SqlUser $SqlUser -SqlPassword $SqlPassword
+
 $adminHash = Get-Sha256Hex(($AdminLogin.ToUpperInvariant() + ':' + $AdminPassword))
 $regisDay = (Get-Date).ToString('MMM dd yyyy  h:mmtt', [System.Globalization.CultureInfo]::InvariantCulture)
 

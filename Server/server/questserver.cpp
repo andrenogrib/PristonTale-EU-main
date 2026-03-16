@@ -2048,6 +2048,18 @@ void QuestServer::LoadNPCQuests()
 			while (pcDB->Fetch())
 			{
 				SimpleQuestData lsQuestData{};
+				ZeroMemory(szRequiredQuestIDs, sizeof(szRequiredQuestIDs));
+				ZeroMemory(szInclusionQuestIDs, sizeof(szInclusionQuestIDs));
+				ZeroMemory(szJobRestriction, sizeof(szJobRestriction));
+				ZeroMemory(szReqMonsterIds, sizeof(szReqMonsterIds));
+				ZeroMemory(szMonsterCounts, sizeof(szMonsterCounts));
+				ZeroMemory(szReqItemIds, sizeof(szReqItemIds));
+				ZeroMemory(szItemCounts, sizeof(szItemCounts));
+				ZeroMemory(szItemRewards, sizeof(szItemRewards));
+				ZeroMemory(szItemRewardCounts, sizeof(szItemRewardCounts));
+				ZeroMemory(szExtraRewardTypes, sizeof(szExtraRewardTypes));
+				ZeroMemory(szExtraRewardValues, sizeof(szExtraRewardValues));
+				iASMQuestBit = 0;
 
 				pcDB->GetData(1, PARAMTYPE_Integer, &iQuestID);
 				pcDB->GetData(2, PARAMTYPE_Integer, &iGiverID);

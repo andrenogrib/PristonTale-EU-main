@@ -35,6 +35,7 @@ To shut everything down:
 | `expand-pt-db-backups.ps1` | extracts the `.bak` files from the zipped DB backups | after extracting `Files.7z` and before restoring the databases |
 | `restore-pt-docker-dbs.ps1` | restores the databases and guarantees the `admin` account | during first setup or when returning to a clean baseline |
 | `repair-pt-log-cleanup.ps1` | repairs the log-cleanup procedures in `LogDB` and `ChatDB` | when cleanup errors appear or after a manual database restore |
+| `repair-pt-quest-schema.ps1` | repairs the quest tables expected by the current runtime | when startup logs show `Invalid column name 'MainQuestID'` or after a manual database restore |
 | `set-pt-local-runtime-config.ps1` | aligns both `server.ini` files to localhost and the Docker SQL instance | when you are starting from an older `Files` runtime pack |
 | `patch-pt-client-localhost.ps1` | patches `game.dll` to localhost | when the client still points to the wrong IP |
 | `fix-pt-local-runtime.ps1` | applies known local runtime workarounds | after restore or when the runtime is dirty |
@@ -116,6 +117,7 @@ What it does:
 - creates `ChatDB` and `SkillDB` if they do not exist
 - recreates or updates the `admin` account
 - repairs the `CleanUpOldLogs` and `CleanUpOldChatLogs` procedures used by background maintenance
+- repairs the `GameDB` quest schema expected by the current runtime
 
 Important note:
 
@@ -143,6 +145,29 @@ Use it when:
 - the server log shows `Conversion failed when converting date and/or time from character string`
 - the server log shows `Could not find stored procedure 'CleanUpOldChatLogs'`
 - you restored the databases manually and want the same cleanup fixes used by the scripted setup
+
+### `repair-pt-quest-schema.ps1`
+
+Command:
+
+```powershell
+.\scripts\repair-pt-quest-schema.ps1
+```
+
+What it does:
+
+- patches `GameDB.dbo.QuestList`
+- patches `GameDB.dbo.QuestRewardList`
+- adds the newer quest columns expected by the runtime if they are missing
+- backfills safe default values so the startup quest-load query can complete
+- normalizes optional quest string fields from SQL `NULL` to empty strings for the current runtime
+
+Use it when:
+
+- the login or game server log shows `Invalid column name 'MainQuestID'`
+- startup produces many `Quest not found for ... in QuestWindowList ...` warnings
+- startup produces `[LoadNPCQuests] Item ids and counts mismatch` for quests that should not have required items or rewards
+- you restored the databases manually and want the same quest-schema fixes used by the scripted setup
 
 ### `provision-pt-test-account.ps1`
 
