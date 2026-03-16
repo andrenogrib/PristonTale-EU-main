@@ -35,14 +35,28 @@ The repository now also includes local documentation for:
 
 If you want to boot the local environment quickly:
 
-1. if you are starting from a shared runtime backup, read [fresh-setup-from-backup-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/fresh-setup-from-backup-guide.md)
-2. otherwise read [server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md)
-3. start SQL with `.\scripts\start-pt-docker-sql.ps1`
-4. restore the databases with `.\scripts\restore-pt-docker-dbs.ps1`
-5. patch the client if needed with `.\scripts\patch-pt-client-localhost.ps1`
-6. apply local runtime fixes with `.\scripts\fix-pt-local-runtime.ps1`
-7. start the servers with `.\scripts\start-pt-server.ps1`
-8. open `Files/Game/Game.exe`
+First-time setup or full reset:
+
+1. read [fresh-setup-from-backup-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/fresh-setup-from-backup-guide.md)
+2. run `.\scripts\expand-pt-db-backups.ps1`
+3. run `.\scripts\set-pt-local-runtime-config.ps1`
+4. run `.\scripts\start-pt-docker-sql.ps1`
+5. run `.\scripts\restore-pt-docker-dbs.ps1`
+6. run `.\scripts\patch-pt-client-localhost.ps1`
+7. run `.\scripts\fix-pt-local-runtime.ps1`
+8. run `.\scripts\start-pt-server.ps1 -OpenClient`
+
+Normal daily start:
+
+1. read [server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md)
+2. run `.\scripts\start-pt-docker-sql.ps1`
+3. run `.\scripts\start-pt-server.ps1 -OpenClient`
+
+Important warning:
+
+- `.\scripts\restore-pt-docker-dbs.ps1` resets the SQL databases to the backup baseline
+- `.\scripts\fix-pt-local-runtime.ps1` can rebind known test characters to `admin`
+- neither of those should be treated as a normal daily-start step
 
 Documented local test accounts:
 

@@ -13,6 +13,25 @@ Use this guide when:
 This guide is intentionally written for non-programmers.
 You do not need to understand the source code to follow it.
 
+## Standard operating rule
+
+This repository now follows two different startup flows:
+
+- `first-time setup or full reset`: use this when you are setting up the project for the first time or when you intentionally want to reset the databases to the original backup baseline
+- `normal daily start`: use this after the environment has already been set up and you want to keep the current database state, accounts, characters, and edits
+
+Important warning:
+
+- `.\scripts\restore-pt-docker-dbs.ps1` is not a normal daily-start step
+- it restores the SQL backups and overwrites the current database state
+- that can remove custom accounts, undo character ownership changes, and roll back newly created database records
+
+Also important:
+
+- `.\scripts\fix-pt-local-runtime.ps1` is a workaround script, not a normal daily-start step
+- it can rebind known test characters to `admin`
+- use it only when you actually need the local runtime fixes
+
 ## What you need before starting
 
 Download and install these tools first:
@@ -85,6 +104,49 @@ If you want the shortest checklist to send to someone, send this:
 13. Log in with `admin` / `admin`.
 
 The rest of this document explains every step in more detail.
+
+## Two standard flows
+
+### First-time setup or full reset
+
+Use this flow when:
+
+- you are preparing the environment for the first time
+- you extracted a new `Files.7z`
+- you intentionally want to reset the databases to the backup baseline
+
+Command sequence:
+
+```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\restore-pt-docker-dbs.ps1
+.\scripts\patch-pt-client-localhost.ps1
+.\scripts\fix-pt-local-runtime.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+### Normal daily start
+
+Use this flow when:
+
+- the project was already set up before
+- you want to keep the current database state
+- you do not want to lose custom accounts, character ownership, or other runtime edits
+
+Command sequence:
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+Optional only if needed:
+
+- run `.\scripts\set-pt-local-runtime-config.ps1` if someone changed the `server.ini` files
+- run `.\scripts\patch-pt-client-localhost.ps1` if you replaced the runtime client files
+- run `.\scripts\fix-pt-local-runtime.ps1` only if you need the known local runtime workarounds
 
 ## Step 1: Clone or open the repository
 
@@ -233,6 +295,8 @@ Important note:
 - this step restores the baseline `UserDB`
 - if someone had created custom accounts before, they can disappear after a restore
 - that is normal for this scripted baseline flow
+- newly created database-backed characters can also disappear or revert to the older backup state
+- only use this step when you want a reset, not for a normal daily restart
 
 ## Step 7: Patch the client to localhost
 
@@ -273,6 +337,11 @@ It currently helps with:
 - broken premium timer rows
 - missing test character files
 - binding known working characters to `admin`
+
+Important note:
+
+- this script is useful, but it is still a workaround script
+- because it can bind known characters to `admin`, it should not be treated as a required daily-start step
 
 ## Step 9: Start the login and game servers
 
@@ -392,6 +461,15 @@ For a first-time setup from a shared runtime backup, this is the recommended exa
 .\scripts\fix-pt-local-runtime.ps1
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
+
+After that first successful setup, the normal daily start should be:
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+Do not run `.\scripts\restore-pt-docker-dbs.ps1` again unless you want to reset the databases to the backup baseline.
 
 ## Related guides
 

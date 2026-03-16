@@ -14,6 +14,19 @@ Use this guide if you want to:
 
 If you are starting from an older `Files.7z` backup instead of an already-prepared local runtime, read `docs/guides/fresh-setup-from-backup-guide.md` first.
 
+## Standard startup rule
+
+There are two valid startup flows for this project:
+
+- `first-time setup or full reset`: includes database restore and runtime repair steps
+- `normal daily start`: does not restore the databases and does not run workaround scripts unless needed
+
+Important warning:
+
+- `.\scripts\restore-pt-docker-dbs.ps1` resets the SQL databases to the backup baseline
+- do not use it for a normal daily restart
+- `.\scripts\fix-pt-local-runtime.ps1` can rebind known test characters to `admin`, so it should also be treated as an on-demand repair step
+
 ## Before you begin
 
 This flow assumes:
@@ -42,7 +55,9 @@ Important note:
 - that can remove custom accounts and revert character ownership
 - after a restore, run `.\scripts\provision-pt-test-account.ps1` again to recreate `dedezin`
 
-## Shortest working path
+## Standard flows
+
+### First-time setup or full reset
 
 From the repository root, run:
 
@@ -53,20 +68,35 @@ From the repository root, run:
 .\scripts\restore-pt-docker-dbs.ps1
 .\scripts\patch-pt-client-localhost.ps1
 .\scripts\fix-pt-local-runtime.ps1
-.\scripts\start-pt-server.ps1
-```
-
-Then open:
-
-```powershell
-.\Files\Game\Game.exe
-```
-
-If you want the startup script to open the client too:
-
-```powershell
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
+
+Use that flow when:
+
+- you are setting up the project for the first time
+- you want to restore the backup baseline
+- you intentionally want to reset the databases
+
+### Normal daily start
+
+After the initial setup is complete, the normal daily start should be:
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+Use that flow when:
+
+- you already have a working local environment
+- you want to keep the current SQL state
+- you want to preserve custom accounts, character ownership, and other changes
+
+Run these extra scripts only when needed:
+
+- `.\scripts\set-pt-local-runtime-config.ps1`: if someone changed the local server configuration
+- `.\scripts\patch-pt-client-localhost.ps1`: if the client runtime was replaced
+- `.\scripts\fix-pt-local-runtime.ps1`: if you need the known local runtime workarounds
 
 ## Correct startup order
 
@@ -206,6 +236,11 @@ Use it when:
 - you want a clean local baseline
 - you want to guarantee that `admin/admin` exists
 
+Important warning:
+
+- this script overwrites the restored databases with the backup baseline
+- do not run it as part of a normal daily start if you want to keep the current SQL state
+
 ### `patch-pt-client-localhost.ps1`
 
 File: `scripts/patch-pt-client-localhost.ps1`
@@ -239,6 +274,11 @@ Use it when:
 - `Administrador` triggers a cheat warning
 - the runtime left broken data behind
 - you want guaranteed playable characters on `admin`
+
+Important warning:
+
+- this script can rebind known characters to `admin`
+- do not run it as a daily habit if you want to preserve a custom character owner such as `dedezin`
 
 Characters it tries to keep available on `admin`:
 
@@ -376,8 +416,14 @@ Use it when:
 
 ```powershell
 .\scripts\start-pt-docker-sql.ps1
-.\scripts\fix-pt-local-runtime.ps1
 .\scripts\start-pt-server.ps1
+```
+
+Optional only if needed:
+
+```powershell
+.\scripts\set-pt-local-runtime-config.ps1
+.\scripts\patch-pt-client-localhost.ps1
 ```
 
 ## How to know it worked

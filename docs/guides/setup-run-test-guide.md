@@ -27,6 +27,18 @@ By the end of this guide, you should be able to:
 - test login with an existing account or with `admin / admin`
 - enable GM mode with `/activategm`
 
+## Standard startup rule
+
+Use two different flows depending on what you are trying to do:
+
+- `first-time setup or full reset`: restore the SQL backups and rebuild the local baseline
+- `normal daily start`: keep the current SQL data and only start the services
+
+Important warning:
+
+- `.\scripts\restore-pt-docker-dbs.ps1` is a reset step, not a normal startup step
+- `.\scripts\fix-pt-local-runtime.ps1` is a workaround step, not a required daily startup step
+
 ## 1. What you need installed
 
 Required for a normal Windows SQL setup:
@@ -60,6 +72,46 @@ Practical alternative if you do not want to install `SQLEXPRESS` directly on Win
 
 That path starts SQL Server 2022 in a container, restores the database pack, creates placeholder `ChatDB` and `SkillDB`, and provisions `admin / admin`.
 
+## 1A. First-time setup or full reset
+
+Use this when:
+
+- you are setting up the project for the first time
+- you intentionally want to reset the environment
+- you copied in a fresh `Files` runtime pack
+
+Recommended sequence:
+
+```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\restore-pt-docker-dbs.ps1
+.\scripts\patch-pt-client-localhost.ps1
+.\scripts\fix-pt-local-runtime.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+## 1B. Normal daily start
+
+Use this when:
+
+- the environment already works
+- you want to keep the current database state
+
+Recommended sequence:
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+Only add these when needed:
+
+- `.\scripts\set-pt-local-runtime-config.ps1`
+- `.\scripts\patch-pt-client-localhost.ps1`
+- `.\scripts\fix-pt-local-runtime.ps1`
+
 ## 2. Restore the databases
 
 If you are using the repository scripts:
@@ -85,6 +137,8 @@ Notes:
 - the source also expects `ChatDB` and `SkillDB`
 - the current repository scripts create placeholder databases for those names
 - schema compatibility still matters even when the names are correct
+- this step resets the restored SQL state to the backup baseline
+- do not run it as a normal daily-start step
 
 ## 3. Check or create a working account
 
@@ -187,8 +241,7 @@ If you want the clan web stack to work, keep those files aligned with the same S
 Recommended scripted flow:
 
 ```powershell
-.\scripts\patch-pt-client-localhost.ps1
-.\scripts\fix-pt-local-runtime.ps1
+.\scripts\start-pt-docker-sql.ps1
 .\scripts\start-pt-server.ps1
 ```
 
@@ -209,9 +262,9 @@ To stop everything:
 ## 8. Recommended startup order
 
 1. Start SQL.
-2. Restore the databases if needed.
-3. Patch the client runtime if a new `Files/` pack was copied in.
-4. Run `.\scripts\fix-pt-local-runtime.ps1`.
+2. Restore the databases only if you want a reset or first-time setup.
+3. Patch the client runtime only if a new `Files/` pack was copied in.
+4. Run `.\scripts\fix-pt-local-runtime.ps1` only if you need the known runtime workarounds.
 5. Start the login server and the game server.
 6. Open `Files/Game/Game.exe`.
 7. Log in with a known account.
@@ -331,11 +384,10 @@ Fix:
 If you only want the shortest working local path:
 
 1. Start SQL with `.\scripts\start-pt-docker-sql.ps1`
-2. Restore the databases with `.\scripts\restore-pt-docker-dbs.ps1`
-3. Patch the client with `.\scripts\patch-pt-client-localhost.ps1`
-4. Apply runtime fixes with `.\scripts\fix-pt-local-runtime.ps1`
-5. Start the servers with `.\scripts\start-pt-server.ps1`
-6. Open the client
-7. Log in with `admin / admin` or `dedezin / dedezin123`
+2. Start the servers with `.\scripts\start-pt-server.ps1`
+3. Open the client
+4. Log in with `admin / admin` or `dedezin / dedezin123`
+
+Use the longer restore flow only when you want to reset the environment to the backup baseline.
 
 If the logs show schema errors, fix the database side first before considering any source rebuild.

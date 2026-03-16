@@ -6,7 +6,7 @@ This guide explains, in plain English, what each repository script does, when to
 
 ## Most common usage order
 
-To boot the local environment from scratch:
+For a first-time setup or a full reset:
 
 1. `.\scripts\expand-pt-db-backups.ps1`
 2. `.\scripts\set-pt-local-runtime-config.ps1`
@@ -15,6 +15,11 @@ To boot the local environment from scratch:
 5. `.\scripts\patch-pt-client-localhost.ps1`
 6. `.\scripts\fix-pt-local-runtime.ps1`
 7. `.\scripts\start-pt-server.ps1`
+
+For a normal daily start:
+
+1. `.\scripts\start-pt-docker-sql.ps1`
+2. `.\scripts\start-pt-server.ps1`
 
 To shut everything down:
 
@@ -115,6 +120,7 @@ Important note:
 - it overwrites `UserDB`
 - that means accounts created later can disappear
 - if that happens, run `provision-pt-test-account.ps1` again
+- it should be treated as a reset script, not a daily-start script
 
 ### `provision-pt-test-account.ps1`
 
@@ -232,6 +238,12 @@ Use it when:
 
 - you just restored the database
 - the runtime looks dirty or inconsistent
+
+Important note:
+
+- this script can move known test characters back to the target account
+- by default, that target account is `admin`
+- do not run it routinely if you want to preserve custom character ownership
 
 ## Server control scripts
 
@@ -366,6 +378,13 @@ Use it:
 .\scripts\restore-pt-docker-dbs.ps1
 .\scripts\patch-pt-client-localhost.ps1
 .\scripts\fix-pt-local-runtime.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+### Normal daily start
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
 .\scripts\start-pt-server.ps1 -OpenClient
 ```
 

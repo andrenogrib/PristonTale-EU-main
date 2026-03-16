@@ -83,6 +83,7 @@ Root cause:
 - the restore overwrites `UserDB` with the backup baseline
 - that removes accounts created later
 - it can also return test characters to their older owner
+- if `fix-pt-local-runtime.ps1` is run afterward, known test characters can also be rebound to `admin`
 
 Fix:
 
@@ -116,6 +117,28 @@ After that, try again with:
 
 - login: `admin`
 - password: `admin`
+
+## Normal daily start unexpectedly reset progress
+
+Symptom:
+
+- custom accounts disappeared
+- custom character ownership reverted
+- SQL-side changes seem to have vanished after a restart
+
+Root cause:
+
+- `.\scripts\restore-pt-docker-dbs.ps1` was run during a normal restart
+- that script restores the backup baseline and does not preserve later SQL changes
+
+Correct normal daily start:
+
+```powershell
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\start-pt-server.ps1 -OpenClient
+```
+
+Use the restore flow only when you want a full reset.
 
 ## Safe local test characters on `admin`
 
