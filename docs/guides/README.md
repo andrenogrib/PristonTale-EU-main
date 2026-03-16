@@ -13,6 +13,7 @@ Place documents here when they answer questions such as:
 
 ## Current guides
 
+- `docs/guides/fresh-setup-from-backup-guide.md`: first-time setup guide for someone starting only with a `Files.7z` runtime backup
 - `docs/guides/server-start-guide.md`: start, monitor, and stop the local server
 - `docs/guides/setup-run-test-guide.md`: full local setup and validation guide
 - `docs/guides/gm-handbook.md`: practical GM/Admin handbook for in-game operations

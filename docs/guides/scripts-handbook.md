@@ -8,11 +8,13 @@ This guide explains, in plain English, what each repository script does, when to
 
 To boot the local environment from scratch:
 
-1. `.\scripts\start-pt-docker-sql.ps1`
-2. `.\scripts\restore-pt-docker-dbs.ps1`
-3. `.\scripts\patch-pt-client-localhost.ps1`
-4. `.\scripts\fix-pt-local-runtime.ps1`
-5. `.\scripts\start-pt-server.ps1`
+1. `.\scripts\expand-pt-db-backups.ps1`
+2. `.\scripts\set-pt-local-runtime-config.ps1`
+3. `.\scripts\start-pt-docker-sql.ps1`
+4. `.\scripts\restore-pt-docker-dbs.ps1`
+5. `.\scripts\patch-pt-client-localhost.ps1`
+6. `.\scripts\fix-pt-local-runtime.ps1`
+7. `.\scripts\start-pt-server.ps1`
 
 To shut everything down:
 
@@ -25,7 +27,9 @@ To shut everything down:
 | --- | --- | --- |
 | `start-pt-docker-sql.ps1` | starts SQL Server in Docker | before restoring or using the database |
 | `stop-pt-docker-sql.ps1` | stops SQL in Docker | when testing is finished |
+| `expand-pt-db-backups.ps1` | extracts the `.bak` files from the zipped DB backups | after extracting `Files.7z` and before restoring the databases |
 | `restore-pt-docker-dbs.ps1` | restores the databases and guarantees the `admin` account | during first setup or when returning to a clean baseline |
+| `set-pt-local-runtime-config.ps1` | aligns both `server.ini` files to localhost and the Docker SQL instance | when you are starting from an older `Files` runtime pack |
 | `patch-pt-client-localhost.ps1` | patches `game.dll` to localhost | when the client still points to the wrong IP |
 | `fix-pt-local-runtime.ps1` | applies known local runtime workarounds | after restore or when the runtime is dirty |
 | `start-pt-server.ps1` | opens monitor windows for the login and game servers | when you want the server online |
@@ -40,6 +44,26 @@ To shut everything down:
 | `export-pt-reference-docs.ps1` | regenerates markdown references and the ID section | after database or runtime changes |
 
 ## Database and infrastructure scripts
+
+### `expand-pt-db-backups.ps1`
+
+Command:
+
+```powershell
+.\scripts\expand-pt-db-backups.ps1
+```
+
+What it does:
+
+- finds the zipped backups under `Files/DBS`
+- extracts every `.bak` file into `Files/DBS/extracted`
+- skips existing extracted files unless you use `-Force`
+
+Use it when:
+
+- you just extracted `Files.7z`
+- `Files/DBS/extracted` does not exist yet
+- `restore-pt-docker-dbs.ps1` cannot find the expected `.bak` files
 
 ### `start-pt-docker-sql.ps1`
 
@@ -146,6 +170,29 @@ What it does:
 - creates a new playable local test character
 
 ## Runtime correction scripts
+
+### `set-pt-local-runtime-config.ps1`
+
+Command:
+
+```powershell
+.\scripts\set-pt-local-runtime-config.ps1
+```
+
+What it does:
+
+- updates `Files/Server/login-server/server.ini`
+- updates `Files/Server/game-server/server.ini`
+- points both files to `127.0.0.1`
+- sets the SQL host to `127.0.0.1,1433`
+- sets the ODBC driver to `{ODBC Driver 17 for SQL Server}`
+- warns you if that ODBC driver does not appear to be installed
+
+Use it when:
+
+- you copied in an older `Files` runtime pack
+- the server still points to a public IP or another SQL Server
+- you want to normalize the local configuration before booting
 
 ### `patch-pt-client-localhost.ps1`
 
@@ -313,6 +360,8 @@ Use it:
 ### First-time local setup
 
 ```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
 .\scripts\start-pt-docker-sql.ps1
 .\scripts\restore-pt-docker-dbs.ps1
 .\scripts\patch-pt-client-localhost.ps1
@@ -343,6 +392,7 @@ Use it:
 
 ## Related docs
 
+- `docs/guides/fresh-setup-from-backup-guide.md`
 - `docs/guides/server-start-guide.md`
 - `docs/guides/setup-run-test-guide.md`
 - `docs/guides/account-and-character-management.md`

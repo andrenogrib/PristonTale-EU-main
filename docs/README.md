@@ -24,6 +24,7 @@ This split works well here because the project combines:
 
 ## What lives in each section
 
+- `docs/guides/fresh-setup-from-backup-guide.md`: first-time setup guide for users starting from a shared `Files.7z` runtime backup
 - `docs/guides/server-start-guide.md`: focused guide for starting, monitoring, and stopping the local server
 - `docs/guides/setup-run-test-guide.md`: full local setup guide, from database restore to login testing
 - `docs/guides/gm-handbook.md`: practical handbook for using GM/Admin commands inside the game
@@ -44,7 +45,9 @@ This split works well here because the project combines:
 
 ## Script references used by the docs
 
+- `scripts/expand-pt-db-backups.ps1`: extracts the zipped database backups into `Files/DBS/extracted`
 - `scripts/patch-pt-client-localhost.ps1`: patches `Files/Game/game.dll` so the runtime points to localhost
+- `scripts/set-pt-local-runtime-config.ps1`: updates both `server.ini` files for localhost and Docker SQL
 - `scripts/assign-pt-character-to-account.ps1`: assigns an existing character to a target account
 - `scripts/fix-pt-local-runtime.ps1`: applies local runtime workarounds, including the `Administrador` gold fix
 - `scripts/provision-pt-test-account.ps1`: creates or updates a test account, sets GM permissions, and binds a character
@@ -80,6 +83,7 @@ If the question is "where do I find this?", use this map:
 - script explanations: `docs/guides/scripts-handbook.md`
 - events, EXP, drop, and maintenance: `docs/guides/events-and-rates-guide.md`
 - localhost client patching: `docs/guides/client-localhost-patch-guide.md`
+- first-time setup from a shared runtime backup: `docs/guides/fresh-setup-from-backup-guide.md`
 - full local setup: `docs/guides/setup-run-test-guide.md`
 - server start and stop flow: `docs/guides/server-start-guide.md`
 - runtime pack analysis and known risks: `docs/analysis/project-analysis.md`

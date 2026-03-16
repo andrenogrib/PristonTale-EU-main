@@ -12,6 +12,8 @@ Use this guide if you want to:
 - start the login server and game server
 - open the game and validate the runtime
 
+If you are starting from an older `Files.7z` backup instead of an already-prepared local runtime, read `docs/guides/fresh-setup-from-backup-guide.md` first.
+
 ## Before you begin
 
 This flow assumes:
@@ -45,6 +47,8 @@ Important note:
 From the repository root, run:
 
 ```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
 .\scripts\start-pt-docker-sql.ps1
 .\scripts\restore-pt-docker-dbs.ps1
 .\scripts\patch-pt-client-localhost.ps1
@@ -65,6 +69,13 @@ If you want the startup script to open the client too:
 ```
 
 ## Correct startup order
+
+If this is your first setup from a fresh `Files` runtime pack, first run:
+
+```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
+```
 
 ### 1. Start SQL
 
@@ -122,6 +133,40 @@ Or:
 ```
 
 ## What each script does
+
+### `expand-pt-db-backups.ps1`
+
+File: `scripts/expand-pt-db-backups.ps1`
+
+What it does:
+
+- extracts the database `.bak` files from the `.zip` archives under `Files/DBS`
+- writes the extracted backups into `Files/DBS/extracted`
+- prepares the backup folder used by the Docker SQL restore flow
+
+Use it when:
+
+- you just extracted `Files.7z`
+- you only have `.zip` files under `Files/DBS`
+- the Docker restore step cannot see the expected `.bak` files
+
+### `set-pt-local-runtime-config.ps1`
+
+File: `scripts/set-pt-local-runtime-config.ps1`
+
+What it does:
+
+- updates both `server.ini` files under `Files/Server`
+- sets the server IP values to `127.0.0.1`
+- sets the SQL host to `127.0.0.1,1433`
+- sets the SQL driver to `{ODBC Driver 17 for SQL Server}`
+- warns if the expected ODBC driver is not installed on Windows
+
+Use it when:
+
+- you copied in an older runtime pack
+- the runtime still points to another SQL Server or another IP
+- you want to normalize the local server configuration before booting
 
 ### `start-pt-docker-sql.ps1`
 
@@ -311,6 +356,8 @@ Use it when:
 ### Start everything from scratch
 
 ```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
 .\scripts\start-pt-docker-sql.ps1
 .\scripts\restore-pt-docker-dbs.ps1
 .\scripts\patch-pt-client-localhost.ps1
@@ -386,6 +433,7 @@ For now:
 
 ## Related docs
 
+- `docs/guides/fresh-setup-from-backup-guide.md`
 - `docs/guides/setup-run-test-guide.md`
 - `docs/analysis/project-analysis.md`
 - `docs/reference/server-commands-reference.md`

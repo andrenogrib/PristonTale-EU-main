@@ -35,13 +35,14 @@ The repository now also includes local documentation for:
 
 If you want to boot the local environment quickly:
 
-1. read [server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md)
-2. start SQL with `.\scripts\start-pt-docker-sql.ps1`
-3. restore the databases with `.\scripts\restore-pt-docker-dbs.ps1`
-4. patch the client if needed with `.\scripts\patch-pt-client-localhost.ps1`
-5. apply local runtime fixes with `.\scripts\fix-pt-local-runtime.ps1`
-6. start the servers with `.\scripts\start-pt-server.ps1`
-7. open `Files/Game/Game.exe`
+1. if you are starting from a shared runtime backup, read [fresh-setup-from-backup-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/fresh-setup-from-backup-guide.md)
+2. otherwise read [server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md)
+3. start SQL with `.\scripts\start-pt-docker-sql.ps1`
+4. restore the databases with `.\scripts\restore-pt-docker-dbs.ps1`
+5. patch the client if needed with `.\scripts\patch-pt-client-localhost.ps1`
+6. apply local runtime fixes with `.\scripts\fix-pt-local-runtime.ps1`
+7. start the servers with `.\scripts\start-pt-server.ps1`
+8. open `Files/Game/Game.exe`
 
 Documented local test accounts:
 
@@ -51,6 +52,7 @@ Documented local test accounts:
 ## Main documentation
 
 - [docs/README.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/README.md): documentation index
+- [fresh-setup-from-backup-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/fresh-setup-from-backup-guide.md): first-time setup guide for users who only have `Files.7z`
 - [server-start-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/server-start-guide.md): direct guide for starting, monitoring, and stopping the server
 - [setup-run-test-guide.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/setup-run-test-guide.md): full local setup and test guide
 - [gm-handbook.md](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/docs/guides/gm-handbook.md): practical in-game GM/Admin handbook
@@ -66,8 +68,10 @@ Documented local test accounts:
 
 ## Useful scripts
 
+- [expand-pt-db-backups.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/expand-pt-db-backups.ps1): extracts the database `.bak` files from `Files/DBS/*.zip`
 - [start-pt-docker-sql.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/start-pt-docker-sql.ps1): starts SQL Server in Docker
 - [restore-pt-docker-dbs.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/restore-pt-docker-dbs.ps1): restores the databases and provisions `admin`
+- [set-pt-local-runtime-config.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/set-pt-local-runtime-config.ps1): updates `server.ini` for localhost and Docker SQL
 - [start-pt-server.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/start-pt-server.ps1): starts the login and game servers
 - [stop-pt-server.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/stop-pt-server.ps1): stops the server processes
 - [find-pt-item.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/find-pt-item.ps1): looks up items by name, item code, or numeric item ID

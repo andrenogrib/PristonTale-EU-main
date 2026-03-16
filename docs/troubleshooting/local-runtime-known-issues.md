@@ -90,6 +90,33 @@ Fix:
 .\scripts\provision-pt-test-account.ps1 -Login 'dedezin' -Password 'dedezin123' -CharacterName 'test_ps_100' -GameMasterType 1 -GameMasterLevel 4
 ```
 
+## Every account says `incorrect password`
+
+Symptom:
+
+- even known accounts such as `admin` fail to log in
+- the login server log shows `SELECT TOP(1) FROM UserInfo query failed for account '<login>'`
+
+Root cause:
+
+- this usually does not mean the password is wrong
+- it usually means the login server is querying a `UserDB` that does not contain that account
+- this can happen if the databases were not restored yet or the runtime still points to the wrong SQL configuration
+
+Fix order:
+
+```powershell
+.\scripts\expand-pt-db-backups.ps1
+.\scripts\set-pt-local-runtime-config.ps1
+.\scripts\start-pt-docker-sql.ps1
+.\scripts\restore-pt-docker-dbs.ps1
+```
+
+After that, try again with:
+
+- login: `admin`
+- password: `admin`
+
 ## Safe local test characters on `admin`
 
 The currently recommended local test characters are:
