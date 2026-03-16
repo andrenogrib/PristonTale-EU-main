@@ -47,6 +47,7 @@ This split works well here because the project combines:
 
 - `scripts/expand-pt-db-backups.ps1`: extracts the zipped database backups into `Files/DBS/extracted`
 - `scripts/patch-pt-client-localhost.ps1`: patches `Files/Game/game.dll` so the runtime points to localhost
+- `scripts/repair-pt-log-cleanup.ps1`: repairs the log-cleanup procedures used by `LogDB` and `ChatDB`
 - `scripts/set-pt-local-runtime-config.ps1`: updates both `server.ini` files for localhost and Docker SQL
 - `scripts/assign-pt-character-to-account.ps1`: assigns an existing character to a target account
 - `scripts/fix-pt-local-runtime.ps1`: applies local runtime workarounds, including the `Administrador` gold fix

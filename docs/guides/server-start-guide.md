@@ -123,6 +123,8 @@ This starts SQL Server in Docker on `127.0.0.1,1433`.
 
 This restores the `.bak` files, creates `ChatDB` and `SkillDB` if they are missing, and guarantees `admin/admin`.
 
+It also repairs the log-cleanup maintenance procedures in `LogDB` and `ChatDB`.
+
 ### 3. Patch the client to localhost
 
 ```powershell
@@ -226,9 +228,26 @@ What it does:
 - connects to SQL on `127.0.0.1,1433`
 - restores `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew`, and `UserDB`
 - creates `ChatDB` and `SkillDB` as placeholders if they are missing
+- repairs the background log-cleanup procedures in `LogDB` and `ChatDB`
 - creates or updates `admin/admin`
 - sets that account as GM/Admin for local testing
 - overwrites `UserDB` with the restored baseline
+
+### `repair-pt-log-cleanup.ps1`
+
+File: `scripts/repair-pt-log-cleanup.ps1`
+
+What it does:
+
+- patches `LogDB.dbo.CleanUpOldLogs`
+- creates `ChatDB.dbo.CleanUpOldChatLogs`
+- makes the `LogDB` cleanup routine accept both `en-US` and `pt-BR` text date formats
+
+Use it when:
+
+- the background cleanup task logs a date-conversion error
+- `ChatDB` is missing `CleanUpOldChatLogs`
+- you restored the databases manually and want to apply the same maintenance fix as the scripted restore
 
 Use it when:
 

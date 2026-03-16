@@ -140,6 +140,29 @@ Correct normal daily start:
 
 Use the restore flow only when you want a full reset.
 
+## Background log cleanup fails
+
+Symptom:
+
+- the server log shows `Conversion failed when converting date and/or time from character string`
+- the server log shows `Could not find stored procedure 'CleanUpOldChatLogs'`
+
+Root cause:
+
+- `LogDB.dbo.CleanUpOldLogs` was originally written against a stricter date format
+- `WarehouseLog.Date` in this backup uses Portuguese month text such as `Set`
+- `ChatDB` may exist only as a placeholder database without `dbo.CleanUpOldChatLogs`
+
+Fix:
+
+```powershell
+.\scripts\repair-pt-log-cleanup.ps1
+```
+
+Current scripted restore status:
+
+- `.\scripts\restore-pt-docker-dbs.ps1` now applies this fix automatically after restoring the databases
+
 ## Safe local test characters on `admin`
 
 The currently recommended local test characters are:

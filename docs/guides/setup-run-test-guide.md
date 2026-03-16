@@ -71,6 +71,7 @@ Practical alternative if you do not want to install `SQLEXPRESS` directly on Win
 - `.\scripts\restore-pt-docker-dbs.ps1`
 
 That path starts SQL Server 2022 in a container, restores the database pack, creates placeholder `ChatDB` and `SkillDB`, and provisions `admin / admin`.
+It also repairs the background log-cleanup procedures used by `LogDB` and `ChatDB`.
 
 ## 1A. First-time setup or full reset
 
@@ -136,6 +137,7 @@ Notes:
 
 - the source also expects `ChatDB` and `SkillDB`
 - the current repository scripts create placeholder databases for those names
+- the current repository scripts also repair the background cleanup procedures for `LogDB` and `ChatDB`
 - schema compatibility still matters even when the names are correct
 - this step resets the restored SQL state to the backup baseline
 - do not run it as a normal daily-start step

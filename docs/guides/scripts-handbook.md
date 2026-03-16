@@ -34,6 +34,7 @@ To shut everything down:
 | `stop-pt-docker-sql.ps1` | stops SQL in Docker | when testing is finished |
 | `expand-pt-db-backups.ps1` | extracts the `.bak` files from the zipped DB backups | after extracting `Files.7z` and before restoring the databases |
 | `restore-pt-docker-dbs.ps1` | restores the databases and guarantees the `admin` account | during first setup or when returning to a clean baseline |
+| `repair-pt-log-cleanup.ps1` | repairs the log-cleanup procedures in `LogDB` and `ChatDB` | when cleanup errors appear or after a manual database restore |
 | `set-pt-local-runtime-config.ps1` | aligns both `server.ini` files to localhost and the Docker SQL instance | when you are starting from an older `Files` runtime pack |
 | `patch-pt-client-localhost.ps1` | patches `game.dll` to localhost | when the client still points to the wrong IP |
 | `fix-pt-local-runtime.ps1` | applies known local runtime workarounds | after restore or when the runtime is dirty |
@@ -114,6 +115,7 @@ What it does:
 - restores `ClanDB`, `EventDB`, `GameDB`, `ItemDB`, `LogDB`, `ServerDB`, `SkillDBNew`, and `UserDB`
 - creates `ChatDB` and `SkillDB` if they do not exist
 - recreates or updates the `admin` account
+- repairs the `CleanUpOldLogs` and `CleanUpOldChatLogs` procedures used by background maintenance
 
 Important note:
 
@@ -121,6 +123,26 @@ Important note:
 - that means accounts created later can disappear
 - if that happens, run `provision-pt-test-account.ps1` again
 - it should be treated as a reset script, not a daily-start script
+
+### `repair-pt-log-cleanup.ps1`
+
+Command:
+
+```powershell
+.\scripts\repair-pt-log-cleanup.ps1
+```
+
+What it does:
+
+- patches `LogDB.dbo.CleanUpOldLogs`
+- creates `ChatDB.dbo.CleanUpOldChatLogs` if it is missing
+- makes the `LogDB` cleanup routine accept both English and Portuguese text date formats
+
+Use it when:
+
+- the server log shows `Conversion failed when converting date and/or time from character string`
+- the server log shows `Could not find stored procedure 'CleanUpOldChatLogs'`
+- you restored the databases manually and want the same cleanup fixes used by the scripted setup
 
 ### `provision-pt-test-account.ps1`
 

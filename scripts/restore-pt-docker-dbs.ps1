@@ -105,6 +105,13 @@ IF DB_ID(N'SkillDB') IS NULL
     CREATE DATABASE [SkillDB];
 "@
 
+$repairLogCleanupScript = Join-Path $PSScriptRoot 'repair-pt-log-cleanup.ps1'
+if (-not (Test-Path -LiteralPath $repairLogCleanupScript)) {
+    throw "Could not find '$repairLogCleanupScript'."
+}
+
+& $repairLogCleanupScript -SqlServer $SqlServer -SqlUser $SqlUser -SqlPassword $SqlPassword
+
 $adminHash = Get-Sha256Hex(($AdminLogin.ToUpperInvariant() + ':' + $AdminPassword))
 $regisDay = (Get-Date).ToString('MMM dd yyyy  h:mmtt', [System.Globalization.CultureInfo]::InvariantCulture)
 

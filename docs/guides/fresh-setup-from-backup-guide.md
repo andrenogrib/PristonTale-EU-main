@@ -283,6 +283,7 @@ This script:
 - restores `UserDB`
 - creates `ChatDB` if missing
 - creates `SkillDB` if missing
+- repairs the background cleanup procedures in `LogDB` and `ChatDB`
 - guarantees a working `admin` account
 
 After the restore, the default local test account is:

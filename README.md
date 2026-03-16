@@ -85,6 +85,7 @@ Documented local test accounts:
 - [expand-pt-db-backups.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/expand-pt-db-backups.ps1): extracts the database `.bak` files from `Files/DBS/*.zip`
 - [start-pt-docker-sql.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/start-pt-docker-sql.ps1): starts SQL Server in Docker
 - [restore-pt-docker-dbs.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/restore-pt-docker-dbs.ps1): restores the databases and provisions `admin`
+- [repair-pt-log-cleanup.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/repair-pt-log-cleanup.ps1): repairs `LogDB` and `ChatDB` cleanup procedures after manual restores or maintenance issues
 - [set-pt-local-runtime-config.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/set-pt-local-runtime-config.ps1): updates `server.ini` for localhost and Docker SQL
 - [start-pt-server.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/start-pt-server.ps1): starts the login and game servers
 - [stop-pt-server.ps1](C:/Users/andre/Dropbox/games/priston_tale/PristonTale-EU-main/scripts/stop-pt-server.ps1): stops the server processes
